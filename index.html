@@ -2,17 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 
 <title>Chess Arena</title>
 
-<style>
-/* =========================================================
-   CHESS ARENA
-   One-file graphical chess client
-   ========================================================= */
+<!-- PeerJS -->
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 
+<style>
 :root{
     --bg:#0c1117;
     --bg2:#131a22;
@@ -23,72 +20,38 @@
     --muted:#9da8b4;
     --green:#81b64c;
     --green2:#9bd45c;
-
     --light-square:#f0d9b5;
     --dark-square:#b58863;
-
     --highlight:#f4e64d;
-    --move-dot:#00000055;
     --danger:#d94b4b;
 }
 
-*{
-    box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
-html,
-body{
+html,body{
     margin:0;
     min-height:100%;
     background:
-        radial-gradient(
-            circle at top,
-            #263342 0%,
-            #111820 40%,
-            #080b0f 100%
-        );
+        radial-gradient(circle at top,#263342 0%,#111820 40%,#080b0f 100%);
     color:var(--text);
-    font-family:
-        Inter,
-        Arial,
-        Helvetica,
-        sans-serif;
+    font-family:Inter,Arial,Helvetica,sans-serif;
 }
 
-body{
-    overflow-x:hidden;
-}
+body{overflow-x:hidden}
 
-button,
-input,
-select{
-    font:inherit;
-}
+button,input,select{font:inherit}
+button{cursor:pointer}
 
-button{
-    cursor:pointer;
-}
-
-.app{
-    min-height:100vh;
-}
-
-/* =========================================================
-   HEADER
-   ========================================================= */
+.app{min-height:100vh}
 
 .header{
     height:68px;
-
     display:flex;
     align-items:center;
     justify-content:space-between;
-
     padding:0 22px;
-
     background:#0d1319;
     border-bottom:1px solid var(--border);
-
     position:sticky;
     top:0;
     z-index:100;
@@ -98,7 +61,6 @@ button{
     display:flex;
     align-items:center;
     gap:11px;
-
     font-size:21px;
     font-weight:1000;
     letter-spacing:.5px;
@@ -107,803 +69,387 @@ button{
 .logoIcon{
     width:42px;
     height:42px;
-
     display:grid;
     place-items:center;
-
     border-radius:11px;
-
-    background:
-        linear-gradient(
-            145deg,
-            #9dd866,
-            #4f7f2e
-        );
-
-    box-shadow:
-        0 8px 25px #0008;
-    
+    background:linear-gradient(145deg,#9dd866,#4f7f2e);
+    box-shadow:0 8px 25px #0008;
     font-size:27px;
 }
 
-.headerButtons{
-    display:flex;
-    gap:8px;
-}
-
-/* =========================================================
-   BUTTONS
-   ========================================================= */
+.headerButtons{display:flex;gap:8px}
 
 .btn{
     border:1px solid var(--border);
-
     background:var(--panel2);
-
     color:var(--text);
-
     border-radius:9px;
-
     padding:10px 14px;
-
     font-weight:900;
-
-    transition:
-        transform .12s,
-        filter .12s,
-        background .12s;
+    transition:transform .12s,filter .12s,background .12s;
 }
 
-.btn:hover{
-    filter:brightness(1.16);
-    transform:translateY(-1px);
-}
-
-.btn:active{
-    transform:translateY(1px);
-}
-
-.btn.green{
-    background:var(--green);
-    border-color:transparent;
-    color:#10150d;
-}
-
-.btn.red{
-    background:#762d2d;
-}
-
-.btn.full{
-    width:100%;
-}
-
-/* =========================================================
-   MAIN LAYOUT
-   ========================================================= */
+.btn:hover{filter:brightness(1.16);transform:translateY(-1px)}
+.btn:active{transform:translateY(1px)}
+.btn.green{background:var(--green);border-color:transparent;color:#10150d}
+.btn.red{background:#762d2d}
+.btn.full{width:100%}
 
 .main{
     max-width:1450px;
-
     margin:auto;
-
     padding:22px;
-
     display:grid;
-
-    grid-template-columns:
-        minmax(480px,760px)
-        370px;
-
+    grid-template-columns:minmax(480px,760px) 370px;
     gap:22px;
-
     justify-content:center;
 }
 
-/* =========================================================
-   BOARD SIDE
-   ========================================================= */
-
-.boardArea{
-    min-width:0;
-}
+.boardArea{min-width:0}
 
 .player{
     height:62px;
-
     background:var(--panel);
-
-    border:
-        1px solid var(--border);
-
+    border:1px solid var(--border);
     border-radius:12px;
-
     padding:8px 12px;
-
     display:flex;
     align-items:center;
     justify-content:space-between;
-
     margin-bottom:10px;
 }
 
-.playerInfo{
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
+.playerInfo{display:flex;align-items:center;gap:10px}
 
 .avatar{
     width:42px;
     height:42px;
-
     display:grid;
     place-items:center;
-
     border-radius:9px;
-
     background:#29333e;
-
     font-size:24px;
 }
 
-.playerName{
-    font-weight:950;
-}
-
-.playerSub{
-    color:var(--muted);
-    font-size:12px;
-    margin-top:2px;
-}
+.playerName{font-weight:950}
+.playerSub{color:var(--muted);font-size:12px;margin-top:2px}
 
 .clock{
     min-width:105px;
-
     padding:7px 10px;
-
     border-radius:8px;
-
     background:#0a0f14;
-
     text-align:center;
-
     font-size:24px;
-
     font-weight:1000;
-
     font-variant-numeric:tabular-nums;
 }
 
-.clock.active{
-    background:#354529;
-    color:#d3f49d;
-}
-
-.clock.low{
-    background:#542727;
-    color:#ff9a9a;
-}
-
-/* =========================================================
-   BOARD
-   ========================================================= */
+.clock.active{background:#354529;color:#d3f49d}
+.clock.low{background:#542727;color:#ff9a9a}
 
 .boardShell{
     position:relative;
-
     width:100%;
-
     aspect-ratio:1;
-
     border-radius:9px;
-
     overflow:hidden;
-
-    box-shadow:
-        0 30px 80px #000a,
-        0 0 0 4px #050709;
+    box-shadow:0 30px 80px #000a,0 0 0 4px #050709;
 }
 
 .board{
     width:100%;
     height:100%;
-
     display:grid;
-
     grid-template-columns:repeat(8,1fr);
     grid-template-rows:repeat(8,1fr);
-
     user-select:none;
-
     touch-action:manipulation;
 }
 
 .square{
     position:relative;
-
     display:grid;
-
     place-items:center;
 }
 
-.square.light{
-    background:var(--light-square);
-}
-
-.square.dark{
-    background:var(--dark-square);
-}
+.square.light{background:var(--light-square)}
+.square.dark{background:var(--dark-square)}
 
 .square.selected{
-    box-shadow:
-        inset 0 0 0 5px #f4e64dcc;
+    box-shadow:inset 0 0 0 5px #f4e64dcc;
 }
 
-.square.last{
-    background:#d5ce5199;
-}
+.square.last{background:#d5ce5199}
 
 .square.check{
     background:
-        radial-gradient(
-            circle,
-            #ef7777 0%,
-            #c32e2e 62%,
-            #8d1d1d 100%
-        );
+        radial-gradient(circle,#ef7777 0%,#c32e2e 62%,#8d1d1d 100%);
 }
-
-/* =========================================================
-   PIECES
-   ========================================================= */
 
 .piece{
     width:94%;
     height:94%;
-
     display:grid;
     place-items:center;
-
     z-index:4;
-
-    font-size:
-        clamp(
-            40px,
-            7.4vw,
-            78px
-        );
-
+    font-size:clamp(40px,7.4vw,78px);
     line-height:1;
-
-    transition:
-        transform .12s ease;
-    
-    filter:
-        drop-shadow(
-            0 4px 2px #0007
-        );
+    transition:transform .12s ease;
+    filter:drop-shadow(0 4px 2px #0007);
 }
 
 .whitePiece{
     color:#fff;
-
-    text-shadow:
-        0 2px 0 #a7a7a7,
-        1px 4px 4px #0009;
+    text-shadow:0 2px 0 #a7a7a7,1px 4px 4px #0009;
 }
 
 .blackPiece{
     color:#161616;
-
-    text-shadow:
-        0 1px 0 #777,
-        1px 4px 4px #0009;
+    text-shadow:0 1px 0 #777,1px 4px 4px #0009;
 }
 
-.square:hover .piece{
-    transform:scale(1.045);
-}
-
-/* =========================================================
-   LEGAL MOVE MARKERS
-   ========================================================= */
+.square:hover .piece{transform:scale(1.045)}
 
 .moveDot{
     position:absolute;
-
     width:23%;
     height:23%;
-
     border-radius:50%;
-
-    background:var(--move-dot);
-
+    background:#00000055;
     z-index:2;
 }
 
 .captureRing{
     position:absolute;
-
     inset:7%;
-
-    border:
-        6px solid
-        #00000055;
-
+    border:6px solid #00000055;
     border-radius:50%;
-
     z-index:2;
 }
 
-/* =========================================================
-   COORDINATES
-   ========================================================= */
-
 .coord{
     position:absolute;
-
     font-size:10px;
-
     font-weight:1000;
-
     opacity:.8;
-
     z-index:6;
 }
 
-.file{
-    right:4px;
-    bottom:2px;
-}
-
-.rank{
-    left:4px;
-    top:2px;
-}
-
-.square.light .coord{
-    color:#a77d5d;
-}
-
-.square.dark .coord{
-    color:#f0d9b5;
-}
-
-/* =========================================================
-   CONTROLS
-   ========================================================= */
+.file{right:4px;bottom:2px}
+.rank{left:4px;top:2px}
+.square.light .coord{color:#a77d5d}
+.square.dark .coord{color:#f0d9b5}
 
 .boardControls{
     display:grid;
-
-    grid-template-columns:
-        repeat(4,1fr);
-
+    grid-template-columns:repeat(4,1fr);
     gap:8px;
-
     margin-top:10px;
 }
 
-/* =========================================================
-   SIDE PANELS
-   ========================================================= */
-
 .panel{
     background:var(--panel);
-
-    border:
-        1px solid var(--border);
-
+    border:1px solid var(--border);
     border-radius:13px;
-
     overflow:hidden;
-
     margin-bottom:13px;
 }
 
 .panelTitle{
     padding:14px 15px;
-
-    border-bottom:
-        1px solid var(--border);
-
+    border-bottom:1px solid var(--border);
     font-weight:950;
-
     display:flex;
-
     justify-content:space-between;
 }
 
-.panelBody{
-    padding:13px;
-}
-
-/* =========================================================
-   MODE BUTTONS
-   ========================================================= */
+.panelBody{padding:13px}
 
 .modeButtons{
     display:grid;
-
-    grid-template-columns:
-        repeat(3,1fr);
-
+    grid-template-columns:repeat(3,1fr);
     gap:7px;
 }
 
 .modeButton{
     background:#222b35;
-
     color:#ddd;
-
-    border:
-        1px solid var(--border);
-
+    border:1px solid var(--border);
     border-radius:8px;
-
     padding:10px 4px;
-
     font-size:12px;
-
     font-weight:950;
 }
 
 .modeButton.active{
     background:#81b64c22;
-
     border-color:var(--green);
-
     color:#c9ee99;
 }
 
-/* =========================================================
-   INPUTS
-   ========================================================= */
-
-select,
-input{
+select,input{
     width:100%;
-
     background:#0c1116;
-
     color:#eee;
-
-    border:
-        1px solid var(--border);
-
+    border:1px solid var(--border);
     border-radius:8px;
-
     padding:11px;
-
     margin-top:9px;
-
     outline:none;
 }
 
-input:focus,
-select:focus{
-    border-color:var(--green);
-}
-
-/* =========================================================
-   MOVE HISTORY
-   ========================================================= */
+input:focus,select:focus{border-color:var(--green)}
 
 .moveList{
     height:360px;
-
     overflow:auto;
-
     padding:6px;
 }
 
 .moveRow{
     display:grid;
-
-    grid-template-columns:
-        38px 1fr 1fr;
-
+    grid-template-columns:38px 1fr 1fr;
     min-height:34px;
-
     align-items:center;
-
     padding:0 7px;
-
     border-radius:5px;
-
     font-size:14px;
 }
 
-.moveRow:nth-child(odd){
-    background:#202832;
-}
-
-.moveNumber{
-    color:#778391;
-    font-weight:900;
-}
-
-/* =========================================================
-   CAPTURED
-   ========================================================= */
+.moveRow:nth-child(odd){background:#202832}
+.moveNumber{color:#778391;font-weight:900}
 
 .captured{
     min-height:35px;
-
     display:flex;
-
     flex-wrap:wrap;
-
     gap:2px;
-
     font-size:22px;
 }
 
 .status{
     background:#0c1116;
-
     border-radius:8px;
-
     padding:11px;
-
     color:#cbd2d9;
-
     font-size:13px;
-
     line-height:1.5;
 }
-
-/* =========================================================
-   ONLINE
-   ========================================================= */
 
 .onlineNotice{
     font-size:12px;
-
     color:var(--muted);
-
     margin-top:10px;
-
     line-height:1.4;
 }
 
-/* =========================================================
-   MODALS
-   ========================================================= */
-
 .overlay{
     position:fixed;
-
     inset:0;
-
     display:none;
-
     align-items:center;
     justify-content:center;
-
     padding:20px;
-
     background:#000b;
-
     backdrop-filter:blur(7px);
-
     z-index:500;
 }
 
-.overlay.show{
-    display:flex;
-}
+.overlay.show{display:flex}
 
 .modal{
     width:min(470px,100%);
-
     background:#1a2129;
-
-    border:
-        1px solid #46515e;
-
+    border:1px solid #46515e;
     border-radius:17px;
-
     padding:25px;
-
     text-align:center;
-
-    box-shadow:
-        0 35px 100px #000;
+    box-shadow:0 35px 100px #000;
 }
 
-.modal h2{
-    margin:5px 0 8px;
-}
-
-.modal p{
-    color:var(--muted);
-
-    line-height:1.5;
-}
+.modal h2{margin:5px 0 8px}
+.modal p{color:var(--muted);line-height:1.5}
 
 .bigCode{
     font-size:34px;
-
     letter-spacing:8px;
-
     font-weight:1000;
-
     background:#0c1116;
-
-    border:
-        1px dashed #56616d;
-
+    border:1px dashed #56616d;
     padding:15px;
-
     border-radius:10px;
-
     margin:17px 0;
+    word-break:break-all;
 }
 
 .modalButtons{
     display:flex;
-
     gap:8px;
-
     justify-content:center;
-
     flex-wrap:wrap;
 }
 
-/* =========================================================
-   PROMOTION
-   ========================================================= */
-
 .promotionButtons{
     display:flex;
-
     gap:9px;
-
     justify-content:center;
 }
 
 .promotionButtons button{
     width:65px;
     height:65px;
-
     border:0;
-
     border-radius:10px;
-
     background:#303a46;
-
     color:#fff;
-
     font-size:41px;
 }
 
-/* =========================================================
-   TOAST
-   ========================================================= */
-
 .toast{
     position:fixed;
-
     left:50%;
     bottom:22px;
-
-    transform:
-        translate(-50%,25px);
-
+    transform:translate(-50%,25px);
     opacity:0;
-
     pointer-events:none;
-
     background:#252e38;
-
-    border:
-        1px solid #4a5663;
-
+    border:1px solid #4a5663;
     padding:11px 18px;
-
     border-radius:9px;
-
     z-index:1000;
-
     transition:.2s;
 }
 
 .toast.show{
     opacity:1;
-
-    transform:
-        translate(-50%,0);
+    transform:translate(-50%,0);
 }
 
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
+.hidden{display:none!important}
 
 @media(max-width:1050px){
-
-    .main{
-        grid-template-columns:
-            minmax(430px,760px);
-    }
-
+    .main{grid-template-columns:minmax(430px,760px)}
     .side{
         display:grid;
-
-        grid-template-columns:
-            1fr 1fr;
-
+        grid-template-columns:1fr 1fr;
         gap:13px;
     }
-
-    .panel{
-        margin-bottom:0;
-    }
+    .panel{margin-bottom:0}
 }
 
 @media(max-width:700px){
-
-    .header{
-        height:58px;
-
-        padding:0 10px;
-    }
-
-    .logo{
-        font-size:16px;
-    }
-
-    .logoIcon{
-        width:34px;
-        height:34px;
-
-        font-size:21px;
-    }
-
-    .headerButtons .btn{
-        padding:8px 9px;
-
-        font-size:11px;
-    }
-
-    .main{
-        display:block;
-
-        padding:9px;
-    }
-
-    .side{
-        display:block;
-
-        margin-top:12px;
-    }
-
-    .panel{
-        margin-bottom:10px;
-    }
-
-    .player{
-        height:55px;
-    }
-
-    .clock{
-        min-width:84px;
-
-        font-size:19px;
-    }
-
-    .moveList{
-        height:250px;
-    }
-
-    .boardControls{
-        grid-template-columns:
-            1fr 1fr;
-    }
-}
-
-.hidden{
-    display:none!important;
+    .header{height:58px;padding:0 10px}
+    .logo{font-size:16px}
+    .logoIcon{width:34px;height:34px;font-size:21px}
+    .headerButtons .btn{padding:8px 9px;font-size:11px}
+    .main{display:block;padding:9px}
+    .side{display:block;margin-top:12px}
+    .panel{margin-bottom:10px}
+    .player{height:55px}
+    .clock{min-width:84px;font-size:19px}
+    .moveList{height:250px}
+    .boardControls{grid-template-columns:1fr 1fr}
 }
 </style>
 </head>
@@ -920,213 +466,101 @@ select:focus{
     </div>
 
     <div class="headerButtons">
-        <button class="btn" id="saveButton">
-            💾 Save
-        </button>
-
-        <button class="btn green" id="newGameButton">
-            ＋ New Game
-        </button>
+        <button class="btn" id="saveButton">💾 Save</button>
+        <button class="btn green" id="newGameButton">＋ New Game</button>
     </div>
 
 </header>
-
 
 <main class="main">
 
 <section class="boardArea">
 
-    <!-- BLACK PLAYER -->
-
     <div class="player">
-
         <div class="playerInfo">
-
-            <div class="avatar" id="blackAvatar">
-                🤖
-            </div>
-
+            <div class="avatar" id="blackAvatar">🤖</div>
             <div>
-                <div class="playerName" id="blackName">
-                    Computer
-                </div>
-
-                <div class="playerSub" id="blackSub">
-                    Black
-                </div>
+                <div class="playerName" id="blackName">Computer</div>
+                <div class="playerSub" id="blackSub">Black</div>
             </div>
-
         </div>
 
-        <div class="clock" id="blackClock">
-            10:00
-        </div>
-
+        <div class="clock" id="blackClock">10:00</div>
     </div>
-
-
-    <!-- BOARD -->
 
     <div class="boardShell">
-
-        <div
-            class="board"
-            id="board">
-        </div>
-
+        <div class="board" id="board"></div>
     </div>
 
-
-    <!-- WHITE PLAYER -->
-
-    <div
-        class="player"
-        style="margin-top:10px;margin-bottom:0"
-    >
+    <div class="player" style="margin-top:10px;margin-bottom:0">
 
         <div class="playerInfo">
 
-            <div class="avatar">
-                ♙
-            </div>
+            <div class="avatar">♙</div>
 
             <div>
-                <div class="playerName" id="whiteName">
-                    You
-                </div>
-
-                <div class="playerSub" id="whiteSub">
-                    White
-                </div>
+                <div class="playerName" id="whiteName">You</div>
+                <div class="playerSub" id="whiteSub">White</div>
             </div>
 
         </div>
 
-        <div
-            class="clock active"
-            id="whiteClock"
-        >
-            10:00
-        </div>
+        <div class="clock active" id="whiteClock">10:00</div>
 
     </div>
-
 
     <div class="boardControls">
 
-        <button class="btn" id="undoButton">
-            ↩ Undo
-        </button>
-
-        <button class="btn" id="flipButton">
-            ⇅ Flip
-        </button>
-
-        <button class="btn" id="drawButton">
-            🤝 Draw
-        </button>
-
-        <button class="btn green" id="resignButton">
-            🏳 Resign
-        </button>
+        <button class="btn" id="undoButton">↩ Undo</button>
+        <button class="btn" id="flipButton">⇅ Flip</button>
+        <button class="btn" id="drawButton">🤝 Draw</button>
+        <button class="btn green" id="resignButton">🏳 Resign</button>
 
     </div>
 
 </section>
 
-
-<!-- ======================================================
-     SIDE BAR
-     ====================================================== -->
-
 <aside class="side">
 
 <div class="panel">
 
-    <div class="panelTitle">
-        🎮 Game Mode
-    </div>
+    <div class="panelTitle">🎮 Game Mode</div>
 
     <div class="panelBody">
 
         <div class="modeButtons">
 
-            <button
-                class="modeButton active"
-                id="botMode"
-            >
+            <button class="modeButton active" id="botMode">
                 🤖 BOT
             </button>
 
-            <button
-                class="modeButton"
-                id="localMode"
-            >
+            <button class="modeButton" id="localMode">
                 👥 LOCAL
             </button>
 
-            <button
-                class="modeButton"
-                id="onlineMode"
-            >
+            <button class="modeButton" id="onlineMode">
                 🌐 ONLINE
             </button>
 
         </div>
 
-
         <select id="difficulty">
 
-            <option value="1">
-                Easy Bot
-            </option>
-
-            <option
-                value="2"
-                selected
-            >
-                Medium Bot
-            </option>
-
-            <option value="3">
-                Hard Bot
-            </option>
-
-            <option value="4">
-                Expert Bot
-            </option>
+            <option value="1">Easy Bot</option>
+            <option value="2" selected>Medium Bot</option>
+            <option value="3">Hard Bot</option>
+            <option value="4">Expert Bot</option>
 
         </select>
-
 
         <select id="timeControl">
 
-            <option value="60">
-                1 + 0 Bullet
-            </option>
-
-            <option value="180">
-                3 + 0 Blitz
-            </option>
-
-            <option value="300">
-                5 + 0 Blitz
-            </option>
-
-            <option
-                value="600"
-                selected
-            >
-                10 + 0 Rapid
-            </option>
-
-            <option value="900">
-                15 + 0 Rapid
-            </option>
-
-            <option value="1800">
-                30 + 0 Classical
-            </option>
+            <option value="60">1 + 0 Bullet</option>
+            <option value="180">3 + 0 Blitz</option>
+            <option value="300">5 + 0 Blitz</option>
+            <option value="600" selected>10 + 0 Rapid</option>
+            <option value="900">15 + 0 Rapid</option>
+            <option value="1800">30 + 0 Classical</option>
 
         </select>
 
@@ -1134,44 +568,26 @@ select:focus{
 
 </div>
 
-
 <div class="panel">
 
     <div class="panelTitle">
-
         📜 Moves
-
-        <span id="moveCount">
-            0
-        </span>
-
+        <span id="moveCount">0</span>
     </div>
 
-    <div
-        class="moveList"
-        id="moveList"
-    ></div>
+    <div class="moveList" id="moveList"></div>
 
 </div>
 
-
 <div class="panel">
 
-    <div class="panelTitle">
-        ♟ Captured
-    </div>
+    <div class="panelTitle">♟ Captured</div>
 
     <div class="panelBody">
 
-        <div
-            class="captured"
-            id="captured"
-        ></div>
+        <div class="captured" id="captured"></div>
 
-        <div
-            class="status"
-            id="material"
-        >
+        <div class="status" id="material">
             Material: Even
         </div>
 
@@ -1179,19 +595,13 @@ select:focus{
 
 </div>
 
-
 <div class="panel">
 
-    <div class="panelTitle">
-        📡 Game Status
-    </div>
+    <div class="panelTitle">📡 Game Status</div>
 
     <div class="panelBody">
 
-        <div
-            class="status"
-            id="status"
-        >
+        <div class="status" id="status">
             Your turn. Select a piece.
         </div>
 
@@ -1199,27 +609,17 @@ select:focus{
 
 </div>
 
-
 <div class="panel">
 
-    <div class="panelTitle">
-        🌐 Online Game
-    </div>
+    <div class="panelTitle">🌐 Online Game</div>
 
     <div class="panelBody">
 
-        <button
-            class="btn green full"
-            id="createInvite"
-        >
+        <button class="btn green full" id="createInvite">
             Create Invite
         </button>
 
-        <button
-            class="btn full"
-            id="joinInvite"
-            style="margin-top:8px"
-        >
+        <button class="btn full" id="joinInvite" style="margin-top:8px">
             Join Invite
         </button>
 
@@ -1227,12 +627,10 @@ select:focus{
             id="inviteInput"
             maxlength="6"
             placeholder="Enter 6-character code"
+            autocomplete="off"
         >
 
-        <div
-            class="onlineNotice"
-            id="connectionStatus"
-        >
+        <div class="onlineNotice" id="connectionStatus">
             Offline
         </div>
 
@@ -1243,46 +641,24 @@ select:focus{
 </aside>
 
 </main>
-
 </div>
 
+<!-- Promotion -->
 
-<!-- ======================================================
-     PROMOTION MODAL
-     ====================================================== -->
-
-<div
-    class="overlay"
-    id="promotionOverlay"
->
+<div class="overlay" id="promotionOverlay">
 
 <div class="modal">
 
-    <h2>
-        Choose Promotion
-    </h2>
+    <h2>Choose Promotion</h2>
 
-    <p>
-        Choose the piece for your pawn.
-    </p>
+    <p>Choose the piece for your pawn.</p>
 
     <div class="promotionButtons">
 
-        <button data-promotion="q">
-            ♕
-        </button>
-
-        <button data-promotion="r">
-            ♖
-        </button>
-
-        <button data-promotion="b">
-            ♗
-        </button>
-
-        <button data-promotion="n">
-            ♘
-        </button>
+        <button data-promotion="q">♕</button>
+        <button data-promotion="r">♖</button>
+        <button data-promotion="b">♗</button>
+        <button data-promotion="n">♘</button>
 
     </div>
 
@@ -1290,46 +666,25 @@ select:focus{
 
 </div>
 
+<!-- Game Over -->
 
-<!-- ======================================================
-     GAME OVER
-     ====================================================== -->
-
-<div
-    class="overlay"
-    id="gameOverOverlay"
->
+<div class="overlay" id="gameOverOverlay">
 
 <div class="modal">
 
-    <div
-        id="gameOverIcon"
-        style="font-size:58px"
-    >
-        🏆
-    </div>
+    <div id="gameOverIcon" style="font-size:58px">🏆</div>
 
-    <h2 id="gameOverTitle">
-        Game Over
-    </h2>
+    <h2 id="gameOverTitle">Game Over</h2>
 
-    <p id="gameOverText">
-        Checkmate.
-    </p>
+    <p id="gameOverText">Checkmate.</p>
 
     <div class="modalButtons">
 
-        <button
-            class="btn green"
-            id="playAgain"
-        >
+        <button class="btn green" id="playAgain">
             🔄 Play Again
         </button>
 
-        <button
-            class="btn"
-            id="closeGameOver"
-        >
+        <button class="btn" id="closeGameOver">
             Close
         </button>
 
@@ -1339,654 +694,381 @@ select:focus{
 
 </div>
 
+<!-- Invite -->
 
-<!-- ======================================================
-     INVITE MODAL
-     ====================================================== -->
-
-<div
-    class="overlay"
-    id="inviteOverlay"
->
+<div class="overlay" id="inviteOverlay">
 
 <div class="modal">
 
-    <h2>
-        🌐 Online Game
-    </h2>
+    <h2>🌐 Online Game</h2>
 
     <p>
-        Send this invite code to your friend.
+        Send this 6-character invite code to your friend.
     </p>
 
-    <div
-        class="bigCode"
-        id="inviteCode"
-    >
-        ------
-    </div>
+    <div class="bigCode" id="inviteCode">------</div>
 
     <div class="modalButtons">
 
-        <button
-            class="btn green"
-            id="copyInvite"
-        >
+        <button class="btn green" id="copyInvite">
             📋 Copy Code
         </button>
 
-        <button
-            class="btn"
-            id="closeInvite"
-        >
+        <button class="btn" id="closeInvite">
             Close
         </button>
 
     </div>
 
-</div>
+    <p style="font-size:11px;margin-top:16px">
+        The host is White. The player who joins is Black.
+    </p>
 
 </div>
 
+</div>
 
-<div
-    class="toast"
-    id="toast"
-></div>
-
+<div class="toast" id="toast"></div>
 
 <script>
-
-/* =========================================================
-   CHESS ARENA JAVASCRIPT
-   ========================================================= */
-
 "use strict";
-
 
 /* =========================================================
    CONSTANTS
    ========================================================= */
 
-const FILES = [
-    "a",
-    "b",
-    "c",
-    "d",
-    "e",
-    "f",
-    "g",
-    "h"
-];
+const FILES=["a","b","c","d","e","f","g","h"];
 
-
-const PIECES = {
-
-    w:{
-        k:"♔",
-        q:"♕",
-        r:"♖",
-        b:"♗",
-        n:"♘",
-        p:"♙"
-    },
-
-    b:{
-        k:"♚",
-        q:"♛",
-        r:"♜",
-        b:"♝",
-        n:"♞",
-        p:"♟"
-    }
-
+const PIECES={
+    w:{k:"♔",q:"♕",r:"♖",b:"♗",n:"♘",p:"♙"},
+    b:{k:"♚",q:"♛",r:"♜",b:"♝",n:"♞",p:"♟"}
 };
 
-
-const VALUES = {
-
+const VALUES={
     p:100,
     n:320,
     b:330,
     r:500,
     q:900,
     k:20000
-
 };
 
-
-const PIECE_NAMES = {
-
+const PIECE_NAMES={
     p:"Pawn",
-    n:"Pawn",
+    n:"Knight",
     b:"Bishop",
     r:"Rook",
     q:"Queen",
     k:"King"
-
 };
-
 
 /* =========================================================
    GAME VARIABLES
    ========================================================= */
 
 let board;
-
 let turn;
+let selectedSquare=null;
+let legalTargets=[];
+let flipped=false;
+let gameOver=false;
+let aiThinking=false;
+let gameMode="bot";
+let difficulty=2;
+let moveHistory=[];
+let undoHistory=[];
+let capturedPieces=[];
 
-let selectedSquare = null;
-
-let legalTargets = [];
-
-let flipped = false;
-
-let gameOver = false;
-
-let aiThinking = false;
-
-let gameMode = "bot";
-
-let difficulty = 2;
-
-let moveHistory = [];
-
-let undoHistory = [];
-
-let capturedPieces = [];
-
-let castling = {
-
+let castling={
     wK:true,
     wQ:true,
-
     bK:true,
     bQ:true
-
 };
 
-let enPassant = null;
-
-let whiteTime = 600;
-
-let blackTime = 600;
-
-let timerInterval = null;
-
-let pendingPromotion = null;
-
-let lastMove = null;
-
+let enPassant=null;
+let whiteTime=600;
+let blackTime=600;
+let timerInterval=null;
+let pendingPromotion=null;
+let lastMove=null;
 
 /* =========================================================
-   ONLINE VARIABLES
+   PEERJS ONLINE VARIABLES
    ========================================================= */
 
-let socket = null;
+let peer=null;
+let onlineConnection=null;
 
-let onlineCode = null;
+let onlineCode=null;
+let onlineColor=null;
 
-let onlineColor = null;
-
-let onlineConnected = false;
-
-let onlineHost = false;
-
+let onlineConnected=false;
+let onlineHost=false;
+let peerStarting=false;
 
 /*
-    If this page is served by HTTPS:
-    wss://current-host
+    Host:
+      Peer ID = six-character invite code
 
-    If served by HTTP:
-    ws://current-host:8080
-
-    You can change this later to your deployed server.
+    Guest:
+      PeerJS creates a temporary ID and connects
+      to the host's six-character Peer ID.
 */
 
-let SERVER_URL =
-    location.protocol === "https:"
-        ? "wss://" + location.host
-        : "ws://localhost:8080";
-
-
 /* =========================================================
-   SHORTCUT
+   HELPERS
    ========================================================= */
 
 function $(id){
     return document.getElementById(id);
 }
 
-
-/* =========================================================
-   BASIC HELPERS
-   ========================================================= */
-
 function inside(r,c){
-
-    return (
-        r >= 0 &&
-        r < 8 &&
-        c >= 0 &&
-        c < 8
-    );
-
+    return r>=0 && r<8 && c>=0 && c<8;
 }
-
 
 function opposite(color){
-
-    return color === "w"
-        ? "b"
-        : "w";
-
+    return color==="w"?"b":"w";
 }
-
 
 function cloneBoard(b){
-
     return b.map(row =>
         row.map(piece =>
-            piece
-                ? {...piece}
-                : null
+            piece ? {...piece} : null
         )
     );
-
 }
 
+function cloneMove(move){
+    if(!move) return null;
+
+    return {
+        from:{...move.from},
+        to:{...move.to},
+        castle:move.castle||null,
+        enPassant:!!move.enPassant,
+        doublePawn:!!move.doublePawn,
+        promotion:!!move.promotion
+    };
+}
 
 function squareName(r,c){
-
-    return FILES[c] + (8-r);
-
+    return FILES[c]+(8-r);
 }
-
 
 function showToast(message){
 
-    const toast = $("toast");
+    const toast=$("toast");
 
-    toast.textContent = message;
-
+    toast.textContent=message;
     toast.classList.add("show");
 
     clearTimeout(showToast.timer);
 
-    showToast.timer =
-        setTimeout(
-            () =>
-                toast.classList.remove("show"),
-            2200
-        );
-
+    showToast.timer=setTimeout(()=>{
+        toast.classList.remove("show");
+    },2200);
 }
 
-
 /* =========================================================
-   INITIAL BOARD
+   BOARD
    ========================================================= */
 
 function createStartingBoard(){
 
-    const b =
-        Array.from(
-            {length:8},
-            () => Array(8).fill(null)
-        );
+    const b=Array.from(
+        {length:8},
+        ()=>Array(8).fill(null)
+    );
 
+    const back=["r","n","b","q","k","b","n","r"];
 
-    const backRank = [
-        "r",
-        "n",
-        "b",
-        "q",
-        "k",
-        "b",
-        "n",
-        "r"
-    ];
+    for(let c=0;c<8;c++){
 
-
-    for(
-        let c=0;
-        c<8;
-        c++
-    ){
-
-        b[0][c] = {
+        b[0][c]={
             color:"b",
-            type:backRank[c]
+            type:back[c]
         };
 
-        b[1][c] = {
+        b[1][c]={
             color:"b",
             type:"p"
         };
 
-        b[6][c] = {
+        b[6][c]={
             color:"w",
             type:"p"
         };
 
-        b[7][c] = {
+        b[7][c]={
             color:"w",
-            type:backRank[c]
+            type:back[c]
         };
-
     }
 
-
     return b;
-
 }
 
-
 /* =========================================================
-   FIND KING
+   KING
    ========================================================= */
 
 function findKing(b,color){
 
-    for(
-        let r=0;
-        r<8;
-        r++
-    ){
+    for(let r=0;r<8;r++){
 
-        for(
-            let c=0;
-            c<8;
-            c++
-        ){
+        for(let c=0;c<8;c++){
 
-            const piece = b[r][c];
+            const p=b[r][c];
 
             if(
-                piece &&
-                piece.color === color &&
-                piece.type === "k"
+                p &&
+                p.color===color &&
+                p.type==="k"
             ){
-
-                return {
-                    r,
-                    c
-                };
-
+                return {r,c};
             }
-
         }
-
     }
 
     return null;
-
 }
-
 
 /* =========================================================
    ATTACK DETECTION
    ========================================================= */
 
-function squareAttacked(
-    b,
-    r,
-    c,
-    attackingColor
-){
+function squareAttacked(b,r,c,attackingColor){
 
-    /*
-       Pawn attacks
-    */
+    const pawnDirection=
+        attackingColor==="w"?-1:1;
 
-    const pawnDirection =
-        attackingColor === "w"
-            ? -1
-            : 1;
+    const pawnRow=r-pawnDirection;
 
-    const pawnRow =
-        r - pawnDirection;
+    for(const dc of [-1,1]){
 
-
-    for(
-        const dc of [-1,1]
-    ){
-
-        const rr = pawnRow;
-
-        const cc = c + dc;
+        const rr=pawnRow;
+        const cc=c+dc;
 
         if(
             inside(rr,cc) &&
-            b[rr][cc]?.color === attackingColor &&
-            b[rr][cc]?.type === "p"
+            b[rr][cc]?.color===attackingColor &&
+            b[rr][cc]?.type==="p"
         ){
-
             return true;
-
         }
-
     }
 
-
-    /*
-       Knight attacks
-    */
-
-    const knightMoves = [
-
-        [-2,-1],
-        [-2,1],
-
-        [-1,-2],
-        [-1,2],
-
-        [1,-2],
-        [1,2],
-
-        [2,-1],
-        [2,1]
-
+    const knightMoves=[
+        [-2,-1],[-2,1],
+        [-1,-2],[-1,2],
+        [1,-2],[1,2],
+        [2,-1],[2,1]
     ];
 
+    for(const [dr,dc] of knightMoves){
 
-    for(
-        const [dr,dc]
-        of knightMoves
-    ){
-
-        const rr = r + dr;
-
-        const cc = c + dc;
+        const rr=r+dr;
+        const cc=c+dc;
 
         if(
             inside(rr,cc) &&
-            b[rr][cc]?.color === attackingColor &&
-            b[rr][cc]?.type === "n"
+            b[rr][cc]?.color===attackingColor &&
+            b[rr][cc]?.type==="n"
         ){
-
             return true;
-
         }
-
     }
 
+    for(let dr=-1;dr<=1;dr++){
 
-    /*
-       King attacks
-    */
+        for(let dc=-1;dc<=1;dc++){
 
-    for(
-        let dr=-1;
-        dr<=1;
-        dr++
-    ){
+            if(!dr&&!dc) continue;
 
-        for(
-            let dc=-1;
-            dc<=1;
-            dc++
-        ){
-
-            if(!dr && !dc)
-                continue;
-
-            const rr = r + dr;
-
-            const cc = c + dc;
+            const rr=r+dr;
+            const cc=c+dc;
 
             if(
                 inside(rr,cc) &&
-                b[rr][cc]?.color === attackingColor &&
-                b[rr][cc]?.type === "k"
+                b[rr][cc]?.color===attackingColor &&
+                b[rr][cc]?.type==="k"
             ){
-
                 return true;
-
             }
-
         }
-
     }
 
-
-    /*
-       Rooks and queens
-    */
-
-    const straightDirections = [
-
-        [-1,0],
-        [1,0],
-        [0,-1],
-        [0,1]
-
+    const straight=[
+        [-1,0],[1,0],[0,-1],[0,1]
     ];
 
+    for(const [dr,dc] of straight){
 
-    for(
-        const [dr,dc]
-        of straightDirections
-    ){
+        let rr=r+dr;
+        let cc=c+dc;
 
-        let rr = r + dr;
+        while(inside(rr,cc)){
 
-        let cc = c + dc;
+            const p=b[rr][cc];
 
-
-        while(
-            inside(rr,cc)
-        ){
-
-            const piece =
-                b[rr][cc];
-
-
-            if(piece){
+            if(p){
 
                 if(
-                    piece.color === attackingColor &&
-                    (
-                        piece.type === "r" ||
-                        piece.type === "q"
-                    )
+                    p.color===attackingColor &&
+                    (p.type==="r"||p.type==="q")
                 ){
-
                     return true;
-
                 }
 
                 break;
-
             }
 
-
-            rr += dr;
-            cc += dc;
-
+            rr+=dr;
+            cc+=dc;
         }
-
     }
 
-
-    /*
-       Bishops and queens
-    */
-
-    const diagonalDirections = [
-
-        [-1,-1],
-        [-1,1],
-        [1,-1],
-        [1,1]
-
+    const diagonal=[
+        [-1,-1],[-1,1],
+        [1,-1],[1,1]
     ];
 
+    for(const [dr,dc] of diagonal){
 
-    for(
-        const [dr,dc]
-        of diagonalDirections
-    ){
+        let rr=r+dr;
+        let cc=c+dc;
 
-        let rr = r + dr;
+        while(inside(rr,cc)){
 
-        let cc = c + dc;
+            const p=b[rr][cc];
 
-
-        while(
-            inside(rr,cc)
-        ){
-
-            const piece =
-                b[rr][cc];
-
-
-            if(piece){
+            if(p){
 
                 if(
-                    piece.color === attackingColor &&
-                    (
-                        piece.type === "b" ||
-                        piece.type === "q"
-                    )
+                    p.color===attackingColor &&
+                    (p.type==="b"||p.type==="q")
                 ){
-
                     return true;
-
                 }
 
                 break;
-
             }
 
-
-            rr += dr;
-            cc += dc;
-
+            rr+=dr;
+            cc+=dc;
         }
-
     }
-
 
     return false;
-
 }
 
+function isInCheck(b,color){
 
-/* =========================================================
-   CHECK
-   ========================================================= */
+    const king=findKing(b,color);
 
-function isInCheck(
-    b,
-    color
-){
-
-    const king =
-        findKing(b,color);
-
-    if(!king)
-        return true;
+    if(!king) return true;
 
     return squareAttacked(
         b,
@@ -1994,778 +1076,383 @@ function isInCheck(
         king.c,
         opposite(color)
     );
-
 }
 
-
 /* =========================================================
-   PSEUDO LEGAL MOVES
+   MOVE GENERATION
    ========================================================= */
 
 function generatePseudoMoves(
     b,
     color,
-    rights = castling,
-    ep = enPassant
+    rights=castling,
+    ep=enPassant
 ){
 
-    const moves = [];
+    const moves=[];
 
+    for(let r=0;r<8;r++){
 
-    for(
-        let r=0;
-        r<8;
-        r++
-    ){
+        for(let c=0;c<8;c++){
 
-        for(
-            let c=0;
-            c<8;
-            c++
-        ){
+            const piece=b[r][c];
 
-            const piece =
-                b[r][c];
-
-
-            if(
-                !piece ||
-                piece.color !== color
-            ){
-
+            if(!piece||piece.color!==color)
                 continue;
 
-            }
+            if(piece.type==="p"){
 
+                const direction=color==="w"?-1:1;
+                const startRow=color==="w"?6:1;
+                const promotionRow=color==="w"?0:7;
 
-            /*
-               PAWN
-            */
-
-            if(piece.type === "p"){
-
-                const direction =
-                    color === "w"
-                        ? -1
-                        : 1;
-
-                const startRow =
-                    color === "w"
-                        ? 6
-                        : 1;
-
-                const promotionRow =
-                    color === "w"
-                        ? 0
-                        : 7;
-
-
-                const oneRow =
-                    r + direction;
-
+                const one=r+direction;
 
                 if(
-                    inside(oneRow,c) &&
-                    !b[oneRow][c]
+                    inside(one,c)&&
+                    !b[one][c]
                 ){
 
                     moves.push({
-
                         from:{r,c},
-
-                        to:{
-                            r:oneRow,
-                            c
-                        },
-
-                        promotion:
-                            oneRow === promotionRow
-
+                        to:{r:one,c},
+                        promotion:one===promotionRow
                     });
 
-
-                    const twoRow =
-                        r + direction * 2;
-
+                    const two=r+direction*2;
 
                     if(
-                        r === startRow &&
-                        !b[twoRow][c]
+                        r===startRow &&
+                        !b[two][c]
                     ){
 
                         moves.push({
-
                             from:{r,c},
-
-                            to:{
-                                r:twoRow,
-                                c
-                            },
-
+                            to:{r:two,c},
                             doublePawn:true
-
                         });
-
                     }
-
                 }
 
+                for(const dc of [-1,1]){
 
-                for(
-                    const dc of [-1,1]
-                ){
+                    const nr=r+direction;
+                    const nc=c+dc;
 
-                    const nr =
-                        r + direction;
-
-                    const nc =
-                        c + dc;
-
-
-                    if(
-                        !inside(nr,nc)
-                    ){
-
+                    if(!inside(nr,nc))
                         continue;
 
-                    }
-
-
-                    const target =
-                        b[nr][nc];
-
+                    const target=b[nr][nc];
 
                     if(
                         target &&
-                        target.color !== color &&
-                        target.type !== "k"
+                        target.color!==color &&
+                        target.type!=="k"
                     ){
 
                         moves.push({
-
                             from:{r,c},
-
-                            to:{
-                                r:nr,
-                                c:nc
-                            },
-
-                            promotion:
-                                nr === promotionRow
-
+                            to:{r:nr,c:nc},
+                            promotion:nr===promotionRow
                         });
-
                     }
-
-
-                    /*
-                       En passant
-                    */
 
                     if(
                         ep &&
-                        ep.r === nr &&
-                        ep.c === nc
+                        ep.r===nr &&
+                        ep.c===nc
                     ){
 
                         moves.push({
-
                             from:{r,c},
-
-                            to:{
-                                r:nr,
-                                c:nc
-                            },
-
+                            to:{r:nr,c:nc},
                             enPassant:true
-
                         });
-
                     }
-
                 }
-
             }
 
+            if(piece.type==="n"){
 
-            /*
-               KNIGHT
-            */
-
-            if(piece.type === "n"){
-
-                const knightMoves = [
-
-                    [-2,-1],
-                    [-2,1],
-
-                    [-1,-2],
-                    [-1,2],
-
-                    [1,-2],
-                    [1,2],
-
-                    [2,-1],
-                    [2,1]
-
+                const jumps=[
+                    [-2,-1],[-2,1],
+                    [-1,-2],[-1,2],
+                    [1,-2],[1,2],
+                    [2,-1],[2,1]
                 ];
 
+                for(const [dr,dc] of jumps){
 
-                for(
-                    const [dr,dc]
-                    of knightMoves
-                ){
+                    const nr=r+dr;
+                    const nc=c+dc;
 
-                    const nr = r + dr;
-
-                    const nc = c + dc;
-
-
-                    if(
-                        !inside(nr,nc)
-                    ){
-
+                    if(!inside(nr,nc))
                         continue;
 
-                    }
-
-
-                    const target =
-                        b[nr][nc];
-
+                    const target=b[nr][nc];
 
                     if(
                         !target ||
                         (
-                            target.color !== color &&
-                            target.type !== "k"
+                            target.color!==color &&
+                            target.type!=="k"
                         )
                     ){
 
                         moves.push({
-
                             from:{r,c},
-
-                            to:{
-                                r:nr,
-                                c:nc
-                            }
-
+                            to:{r:nr,c:nc}
                         });
-
                     }
-
                 }
-
             }
 
-
-            /*
-               BISHOP / ROOK / QUEEN
-            */
-
             if(
-                piece.type === "b" ||
-                piece.type === "r" ||
-                piece.type === "q"
+                piece.type==="b"||
+                piece.type==="r"||
+                piece.type==="q"
             ){
 
-                let directions;
+                let dirs;
 
+                if(piece.type==="b"){
 
-                if(piece.type === "b"){
-
-                    directions = [
-
-                        [-1,-1],
-                        [-1,1],
-                        [1,-1],
-                        [1,1]
-
+                    dirs=[
+                        [-1,-1],[-1,1],
+                        [1,-1],[1,1]
                     ];
 
-                }
-                else if(piece.type === "r"){
+                }else if(piece.type==="r"){
 
-                    directions = [
-
-                        [-1,0],
-                        [1,0],
-                        [0,-1],
-                        [0,1]
-
+                    dirs=[
+                        [-1,0],[1,0],
+                        [0,-1],[0,1]
                     ];
 
-                }
-                else{
+                }else{
 
-                    directions = [
-
-                        [-1,-1],
-                        [-1,1],
-                        [1,-1],
-                        [1,1],
-
-                        [-1,0],
-                        [1,0],
-                        [0,-1],
-                        [0,1]
-
+                    dirs=[
+                        [-1,-1],[-1,1],
+                        [1,-1],[1,1],
+                        [-1,0],[1,0],
+                        [0,-1],[0,1]
                     ];
-
                 }
 
+                for(const [dr,dc] of dirs){
 
-                for(
-                    const [dr,dc]
-                    of directions
-                ){
+                    let nr=r+dr;
+                    let nc=c+dc;
 
-                    let nr = r + dr;
+                    while(inside(nr,nc)){
 
-                    let nc = c + dc;
-
-
-                    while(
-                        inside(nr,nc)
-                    ){
-
-                        const target =
-                            b[nr][nc];
-
+                        const target=b[nr][nc];
 
                         if(!target){
 
                             moves.push({
-
                                 from:{r,c},
-
-                                to:{
-                                    r:nr,
-                                    c:nc
-                                }
-
+                                to:{r:nr,c:nc}
                             });
 
-                        }
-                        else{
+                        }else{
 
                             if(
-                                target.color !== color &&
-                                target.type !== "k"
+                                target.color!==color &&
+                                target.type!=="k"
                             ){
 
                                 moves.push({
-
                                     from:{r,c},
-
-                                    to:{
-                                        r:nr,
-                                        c:nc
-                                    }
-
+                                    to:{r:nr,c:nc}
                                 });
-
                             }
 
                             break;
-
                         }
 
-
-                        nr += dr;
-                        nc += dc;
-
+                        nr+=dr;
+                        nc+=dc;
                     }
-
                 }
-
             }
 
+            if(piece.type==="k"){
 
-            /*
-               KING
-            */
+                for(let dr=-1;dr<=1;dr++){
 
-            if(piece.type === "k"){
+                    for(let dc=-1;dc<=1;dc++){
 
-                for(
-                    let dr=-1;
-                    dr<=1;
-                    dr++
-                ){
+                        if(!dr&&!dc) continue;
 
-                    for(
-                        let dc=-1;
-                        dc<=1;
-                        dc++
-                    ){
+                        const nr=r+dr;
+                        const nc=c+dc;
 
-                        if(!dr && !dc)
+                        if(!inside(nr,nc))
                             continue;
 
-
-                        const nr =
-                            r + dr;
-
-                        const nc =
-                            c + dc;
-
-
-                        if(
-                            !inside(nr,nc)
-                        ){
-
-                            continue;
-
-                        }
-
-
-                        const target =
-                            b[nr][nc];
-
+                        const target=b[nr][nc];
 
                         if(
                             !target ||
                             (
-                                target.color !== color &&
-                                target.type !== "k"
+                                target.color!==color &&
+                                target.type!=="k"
                             )
                         ){
 
                             moves.push({
-
                                 from:{r,c},
-
-                                to:{
-                                    r:nr,
-                                    c:nc
-                                }
-
+                                to:{r:nr,c:nc}
                             });
-
                         }
-
                     }
-
                 }
 
-
-                /*
-                   CASTLING
-                */
-
-                const row =
-                    color === "w"
-                        ? 7
-                        : 0;
-
-                const enemy =
-                    opposite(color);
-
+                const row=color==="w"?7:0;
+                const enemy=opposite(color);
 
                 if(
-                    r === row &&
-                    c === 4 &&
+                    r===row &&
+                    c===4 &&
                     !isInCheck(b,color)
                 ){
 
-                    /*
-                       Kingside
-                    */
-
-                    const kingSideRight =
-                        color === "w"
-                            ? rights.wK
-                            : rights.bK;
-
+                    const kingSide=
+                        color==="w"
+                            ?rights.wK
+                            :rights.bK;
 
                     if(
-                        kingSideRight &&
+                        kingSide &&
                         !b[row][5] &&
                         !b[row][6] &&
-                        b[row][7]?.type === "r" &&
-                        b[row][7]?.color === color &&
-                        !squareAttacked(
-                            b,
-                            row,
-                            5,
-                            enemy
-                        ) &&
-                        !squareAttacked(
-                            b,
-                            row,
-                            6,
-                            enemy
-                        )
+                        b[row][7]?.type==="r" &&
+                        b[row][7]?.color===color &&
+                        !squareAttacked(b,row,5,enemy) &&
+                        !squareAttacked(b,row,6,enemy)
                     ){
 
                         moves.push({
-
                             from:{r,c},
-
-                            to:{
-                                r:row,
-                                c:6
-                            },
-
+                            to:{r:row,c:6},
                             castle:"K"
-
                         });
-
                     }
 
-
-                    /*
-                       Queenside
-                    */
-
-                    const queenSideRight =
-                        color === "w"
-                            ? rights.wQ
-                            : rights.bQ;
-
+                    const queenSide=
+                        color==="w"
+                            ?rights.wQ
+                            :rights.bQ;
 
                     if(
-                        queenSideRight &&
+                        queenSide &&
                         !b[row][1] &&
                         !b[row][2] &&
                         !b[row][3] &&
-                        b[row][0]?.type === "r" &&
-                        b[row][0]?.color === color &&
-                        !squareAttacked(
-                            b,
-                            row,
-                            3,
-                            enemy
-                        ) &&
-                        !squareAttacked(
-                            b,
-                            row,
-                            2,
-                            enemy
-                        )
+                        b[row][0]?.type==="r" &&
+                        b[row][0]?.color===color &&
+                        !squareAttacked(b,row,3,enemy) &&
+                        !squareAttacked(b,row,2,enemy)
                     ){
 
                         moves.push({
-
                             from:{r,c},
-
-                            to:{
-                                r:row,
-                                c:2
-                            },
-
+                            to:{r:row,c:2},
                             castle:"Q"
-
                         });
-
                     }
-
                 }
-
             }
-
         }
-
     }
 
-
     return moves;
-
 }
 
+function applyMove(b,move,promotion=null){
 
-/* =========================================================
-   APPLY MOVE
-   ========================================================= */
+    const next=cloneBoard(b);
 
-function applyMove(
-    b,
-    move,
-    promotion=null
-){
+    const piece=
+        next[move.from.r][move.from.c];
 
-    const next =
-        cloneBoard(b);
-
-
-    const piece =
-        next[
-            move.from.r
-        ][
-            move.from.c
-        ];
-
-
-    next[
-        move.from.r
-    ][
-        move.from.c
-    ] = null;
-
-
-    /*
-       En passant capture
-    */
+    next[move.from.r][move.from.c]=null;
 
     if(move.enPassant){
 
-        next[
-            move.from.r
-        ][
-            move.to.c
-        ] = null;
-
+        next[move.from.r][move.to.c]=null;
     }
 
+    if(move.castle==="K"){
 
-    /*
-       Castling
-    */
+        next[move.to.r][move.to.c]=piece;
 
-    if(move.castle === "K"){
+        next[move.to.r][5]=
+            next[move.to.r][7];
 
-        next[
-            move.to.r
-        ][
-            move.to.c
-        ] = piece;
-
-
-        next[
-            move.to.r
-        ][5] =
-            next[
-                move.to.r
-            ][7];
-
-
-        next[
-            move.to.r
-        ][7] = null;
-
+        next[move.to.r][7]=null;
 
         return next;
-
     }
 
+    if(move.castle==="Q"){
 
-    if(move.castle === "Q"){
+        next[move.to.r][move.to.c]=piece;
 
-        next[
-            move.to.r
-        ][
-            move.to.c
-        ] = piece;
+        next[move.to.r][3]=
+            next[move.to.r][0];
 
-
-        next[
-            move.to.r
-        ][3] =
-            next[
-                move.to.r
-            ][0];
-
-
-        next[
-            move.to.r
-        ][0] = null;
-
+        next[move.to.r][0]=null;
 
         return next;
-
     }
 
-
-    /*
-       Normal move
-    */
-
-    next[
-        move.to.r
-    ][
-        move.to.c
-    ] = {
-
+    next[move.to.r][move.to.c]={
         color:piece.color,
-
-        type:
-            promotion ||
-            piece.type
-
+        type:promotion||piece.type
     };
 
-
     return next;
-
 }
-
-
-/* =========================================================
-   LEGAL MOVES
-   ========================================================= */
 
 function generateLegalMoves(
     b,
     color,
-    rights = castling,
-    ep = enPassant
+    rights=castling,
+    ep=enPassant
 ){
 
-    const pseudo =
-        generatePseudoMoves(
+    return generatePseudoMoves(
+        b,
+        color,
+        rights,
+        ep
+    ).filter(move=>{
+
+        const next=applyMove(
             b,
-            color,
-            rights,
-            ep
+            move,
+            move.promotion?"q":null
         );
 
-
-    return pseudo.filter(
-        move => {
-
-            const next =
-                applyMove(
-                    b,
-                    move,
-                    move.promotion
-                        ? "q"
-                        : null
-                );
-
-
-            return !isInCheck(
-                next,
-                color
-            );
-
-        }
-    );
-
+        return !isInCheck(
+            next,
+            color
+        );
+    });
 }
 
-
-/* =========================================================
-   MOVES FROM SQUARE
-   ========================================================= */
-
-function getMovesFromSquare(
-    r,
-    c
-){
+function getMovesFromSquare(r,c){
 
     return generateLegalMoves(
         board,
         turn
-    ).filter(
-        move =>
-            move.from.r === r &&
-            move.from.c === c
+    ).filter(move=>
+        move.from.r===r &&
+        move.from.c===c
     );
-
 }
-
 
 /* =========================================================
    NOTATION
@@ -2778,63 +1465,38 @@ function moveNotation(
     promotion
 ){
 
-    if(move.castle === "K")
-        return "O-O";
+    if(move.castle==="K") return "O-O";
+    if(move.castle==="Q") return "O-O-O";
 
-    if(move.castle === "Q")
-        return "O-O-O";
+    let text="";
 
-
-    let text = "";
-
-
-    if(piece.type !== "p"){
-
-        text +=
-            PIECE_NAMES[
-                piece.type
-            ][0];
-
+    if(piece.type!=="p"){
+        text+=PIECE_NAMES[piece.type][0];
     }
-
 
     if(captured){
 
-        if(piece.type === "p")
-            text += FILES[
-                move.from.c
-            ];
+        if(piece.type==="p"){
+            text+=FILES[move.from.c];
+        }
 
-        text += "x";
-
+        text+="x";
     }
 
-
-    text +=
-        squareName(
-            move.to.r,
-            move.to.c
-        );
-
+    text+=squareName(
+        move.to.r,
+        move.to.c
+    );
 
     if(promotion){
-
-        text +=
-            "=" +
-            PIECE_NAMES[
-                promotion
-            ][0];
-
+        text+="="+PIECE_NAMES[promotion][0];
     }
 
-
     return text;
-
 }
 
-
 /* =========================================================
-   CASTLING RIGHTS UPDATE
+   CASTLING RIGHTS
    ========================================================= */
 
 function updateCastlingRights(
@@ -2843,121 +1505,83 @@ function updateCastlingRights(
     captured
 ){
 
-    if(piece.type === "k"){
+    if(piece.type==="k"){
 
-        if(piece.color === "w"){
-
-            castling.wK = false;
-            castling.wQ = false;
-
+        if(piece.color==="w"){
+            castling.wK=false;
+            castling.wQ=false;
+        }else{
+            castling.bK=false;
+            castling.bQ=false;
         }
-        else{
-
-            castling.bK = false;
-            castling.bQ = false;
-
-        }
-
     }
 
-
-    if(piece.type === "r"){
-
-        if(
-            piece.color === "w" &&
-            move.from.r === 7 &&
-            move.from.c === 0
-        ){
-
-            castling.wQ = false;
-
-        }
-
+    if(piece.type==="r"){
 
         if(
-            piece.color === "w" &&
-            move.from.r === 7 &&
-            move.from.c === 7
+            piece.color==="w" &&
+            move.from.r===7 &&
+            move.from.c===0
         ){
-
-            castling.wK = false;
-
+            castling.wQ=false;
         }
-
 
         if(
-            piece.color === "b" &&
-            move.from.r === 0 &&
-            move.from.c === 0
+            piece.color==="w" &&
+            move.from.r===7 &&
+            move.from.c===7
         ){
-
-            castling.bQ = false;
-
+            castling.wK=false;
         }
-
 
         if(
-            piece.color === "b" &&
-            move.from.r === 0 &&
-            move.from.c === 7
+            piece.color==="b" &&
+            move.from.r===0 &&
+            move.from.c===0
         ){
-
-            castling.bK = false;
-
+            castling.bQ=false;
         }
 
+        if(
+            piece.color==="b" &&
+            move.from.r===0 &&
+            move.from.c===7
+        ){
+            castling.bK=false;
+        }
     }
 
-
-    /*
-       Captured rook
-    */
-
-    if(
-        captured &&
-        captured.type === "r"
-    ){
+    if(captured&&captured.type==="r"){
 
         if(
-            move.to.r === 7 &&
-            move.to.c === 0
+            move.to.r===7 &&
+            move.to.c===0
         ){
-
-            castling.wQ = false;
-
+            castling.wQ=false;
         }
 
         if(
-            move.to.r === 7 &&
-            move.to.c === 7
+            move.to.r===7 &&
+            move.to.c===7
         ){
-
-            castling.wK = false;
-
+            castling.wK=false;
         }
 
         if(
-            move.to.r === 0 &&
-            move.to.c === 0
+            move.to.r===0 &&
+            move.to.c===0
         ){
-
-            castling.bQ = false;
-
+            castling.bQ=false;
         }
 
         if(
-            move.to.r === 0 &&
-            move.to.c === 7
+            move.to.r===0 &&
+            move.to.c===7
         ){
-
-            castling.bK = false;
-
+            castling.bK=false;
         }
-
     }
-
 }
-
 
 /* =========================================================
    MAKE MOVE
@@ -2969,71 +1593,74 @@ function makeMove(
     remote=false
 ){
 
-    if(gameOver)
-        return;
+    if(gameOver) return;
 
+    const piece=
+        board[move.from.r][move.from.c];
 
-    const piece =
-        board[
-            move.from.r
-        ][
-            move.from.c
-        ];
-
-
-    if(!piece)
-        return;
-
-
-    const captured =
-        move.enPassant
-
-            ? board[
-                move.from.r
-            ][
-                move.to.c
-            ]
-
-            : board[
-                move.to.r
-            ][
-                move.to.c
-            ];
-
+    if(!piece) return;
 
     /*
-       Save undo state
+       Online validation.
+       Remote moves must be made by the opponent
+       and must arrive on our opponent's turn.
     */
+
+    if(remote){
+
+        if(gameMode!=="online")
+            return;
+
+        if(piece.color!==turn)
+            return;
+
+        if(piece.color===onlineColor)
+            return;
+
+    }
+
+    const legal=
+        generateLegalMoves(
+            board,
+            turn
+        ).find(m=>
+            m.from.r===move.from.r &&
+            m.from.c===move.from.c &&
+            m.to.r===move.to.r &&
+            m.to.c===move.to.c &&
+            (!!m.castle===!!move.castle) &&
+            (!!m.enPassant===!!move.enPassant)
+        );
+
+    if(!legal){
+        console.warn("Rejected illegal move",move);
+        return;
+    }
+
+    move=legal;
+
+    const captured=
+        move.enPassant
+            ?board[move.from.r][move.to.c]
+            :board[move.to.r][move.to.c];
 
     undoHistory.push({
 
-        board:
-            cloneBoard(board),
-
+        board:cloneBoard(board),
         turn,
-
-        castling:
-            {...castling},
-
-        enPassant:
-            enPassant
-                ? {...enPassant}
-                : null,
-
+        castling:{...castling},
+        enPassant:enPassant?{...enPassant}:null,
         whiteTime,
-
         blackTime,
 
-        moveHistory:
-            moveHistory.map(x => ({...x})),
+        moveHistory:moveHistory.map(x=>({
+            ...x,
+            move:x.move?cloneMove(x.move):null
+        })),
 
-        capturedPieces:
-            capturedPieces.map(x => ({...x})),
-
-        lastMove
-
+        capturedPieces:capturedPieces.map(x=>({...x})),
+        lastMove:lastMove?{...lastMove}:null
     });
-
 
     updateCastlingRights(
         move,
@@ -3041,56 +1668,30 @@ function makeMove(
         captured
     );
 
-
-    board =
-        applyMove(
-            board,
-            move,
-            promotion
-        );
-
+    board=applyMove(
+        board,
+        move,
+        promotion
+    );
 
     if(captured){
-
-        capturedPieces.push(
-            captured
-        );
-
+        capturedPieces.push({...captured});
     }
 
-
-    /*
-       En passant target
-    */
-
-    enPassant = null;
-
+    enPassant=null;
 
     if(
-        piece.type === "p" &&
-        Math.abs(
-            move.to.r -
-            move.from.r
-        ) === 2
+        piece.type==="p" &&
+        Math.abs(move.to.r-move.from.r)===2
     ){
 
-        enPassant = {
-
-            r:
-                (
-                    move.from.r +
-                    move.to.r
-                ) / 2,
-
-            c:
-                move.from.c
-
+        enPassant={
+            r:(move.from.r+move.to.r)/2,
+            c:move.from.c
         };
-
     }
 
-
-    const notation =
+    const notation=
         moveNotation(
             move,
             piece,
@@ -3098,62 +1699,45 @@ function makeMove(
             promotion
         );
 
-
-    lastMove = {
+    lastMove={
         from:{...move.from},
         to:{...move.to}
     };
 
-
     moveHistory.push({
 
         notation,
-
         color:piece.color,
 
-        move:{
-            from:{...move.from},
-            to:{...move.to}
-        }
+        move:cloneMove(move)
 
     });
 
+    turn=opposite(turn);
 
-    turn =
-        opposite(turn);
-
-
-    selectedSquare = null;
-
-    legalTargets = [];
-
+    selectedSquare=null;
+    legalTargets=[];
 
     renderBoard();
-
     updatePanels();
-
     saveGame();
 
+    const state=getGameState(turn);
 
-    const state =
-        getGameState(turn);
-
-
-    if(state === "check"){
+    if(state==="check"){
 
         setStatus(
-            `${turn === "w" ? "White" : "Black"} is in check!`
+            `${turn==="w"?"White":"Black"} is in check!`
         );
 
         playSound("check");
 
-    }
-    else if(state === "mate"){
+    }else if(state==="mate"){
 
-        const winner =
-            turn === "w"
-                ? "Black wins!"
-                : "White wins!";
+        const winner=
+            turn==="w"
+                ?"Black wins!"
+                :"White wins!";
 
         finishGame(
             winner,
@@ -3163,8 +1747,7 @@ function makeMove(
 
         return;
 
-    }
-    else if(state === "stalemate"){
+    }else if(state==="stalemate"){
 
         finishGame(
             "Draw",
@@ -3174,47 +1757,25 @@ function makeMove(
 
         return;
 
-    }
-    else{
+    }else{
 
         setStatus(
-            `${turn === "w" ? "White" : "Black"} to move.`
+            `${turn==="w"?"White":"Black"} to move.`
         );
-
     }
 
-
     playSound(
-        captured
-            ? "capture"
-            : "move"
+        captured?"capture":"move"
     );
-
 
     startClock();
 
-
     /*
-       Bot
+       Send only our local move.
     */
 
     if(
-        gameMode === "bot" &&
-        turn === "b" &&
-        !remote
-    ){
-
-        computerMove();
-
-    }
-
-
-    /*
-       Online
-    */
-
-    if(
-        gameMode === "online" &&
+        gameMode==="online" &&
         !remote
     ){
 
@@ -3222,11 +1783,21 @@ function makeMove(
             move,
             promotion
         );
-
     }
 
-}
+    /*
+       Bot.
+    */
 
+    if(
+        gameMode==="bot" &&
+        turn==="b" &&
+        !remote
+    ){
+
+        computerMove();
+    }
+}
 
 /* =========================================================
    GAME STATE
@@ -3234,292 +1805,166 @@ function makeMove(
 
 function getGameState(color){
 
-    const moves =
+    const moves=
         generateLegalMoves(
             board,
             color
         );
 
+    if(moves.length===0){
 
-    if(moves.length === 0){
-
-        if(
-            isInCheck(
-                board,
-                color
-            )
-        ){
-
-            return "mate";
-
-        }
-
-        return "stalemate";
-
+        return isInCheck(board,color)
+            ?"mate"
+            :"stalemate";
     }
 
-
-    if(
-        isInCheck(
-            board,
-            color
-        )
-    ){
-
+    if(isInCheck(board,color))
         return "check";
 
-    }
-
-
     return "play";
-
 }
 
-
 /* =========================================================
-   RENDER BOARD
+   RENDER
    ========================================================= */
 
 function renderBoard(){
 
-    const boardElement =
-        $("board");
+    const boardElement=$("board");
 
+    boardElement.innerHTML="";
 
-    boardElement.innerHTML = "";
+    for(let visualRow=0;visualRow<8;visualRow++){
 
+        for(let visualCol=0;visualCol<8;visualCol++){
 
-    for(
-        let visualRow=0;
-        visualRow<8;
-        visualRow++
-    ){
-
-        for(
-            let visualCol=0;
-            visualCol<8;
-            visualCol++
-        ){
-
-            const r =
+            const r=
                 flipped
-                    ? 7 - visualRow
-                    : visualRow;
+                    ?7-visualRow
+                    :visualRow;
 
-            const c =
+            const c=
                 flipped
-                    ? 7 - visualCol
-                    : visualCol;
+                    ?7-visualCol
+                    :visualCol;
 
+            const square=
+                document.createElement("div");
 
-            const square =
-                document.createElement(
-                    "div"
-                );
+            square.className=
+                "square "+
+                ((r+c)%2?"dark":"light");
 
-
-            square.className =
-                "square " +
-                (
-                    (r+c)%2
-                        ? "dark"
-                        : "light"
-                );
-
-
-            square.dataset.r = r;
-            square.dataset.c = c;
-
+            square.dataset.r=r;
+            square.dataset.c=c;
 
             if(
                 selectedSquare &&
-                selectedSquare.r === r &&
-                selectedSquare.c === c
+                selectedSquare.r===r &&
+                selectedSquare.c===c
             ){
 
-                square.classList.add(
-                    "selected"
-                );
-
+                square.classList.add("selected");
             }
-
 
             if(
                 lastMove &&
                 (
                     (
-                        lastMove.from.r === r &&
-                        lastMove.from.c === c
-                    ) ||
+                        lastMove.from.r===r &&
+                        lastMove.from.c===c
+                    )||
                     (
-                        lastMove.to.r === r &&
-                        lastMove.to.c === c
+                        lastMove.to.r===r &&
+                        lastMove.to.c===c
                     )
                 )
             ){
 
-                square.classList.add(
-                    "last"
-                );
-
+                square.classList.add("last");
             }
 
-
-            const piece =
-                board[r][c];
-
+            const piece=board[r][c];
 
             if(
                 piece &&
-                piece.type === "k" &&
-                piece.color === turn &&
+                piece.type==="k" &&
+                piece.color===turn &&
                 isInCheck(board,turn)
             ){
 
-                square.classList.add(
-                    "check"
-                );
-
+                square.classList.add("check");
             }
 
-
-            /*
-               Legal target
-            */
-
-            const target =
-                legalTargets.find(
-                    move =>
-                        move.to.r === r &&
-                        move.to.c === c
+            const target=
+                legalTargets.find(move=>
+                    move.to.r===r &&
+                    move.to.c===c
                 );
-
 
             if(target){
 
-                const marker =
-                    document.createElement(
-                        "div"
-                    );
+                const marker=
+                    document.createElement("div");
 
+                marker.className=
+                    piece
+                        ?"captureRing"
+                        :"moveDot";
 
-                if(piece){
-
-                    marker.className =
-                        "captureRing";
-
-                }
-                else{
-
-                    marker.className =
-                        "moveDot";
-
-                }
-
-
-                square.appendChild(
-                    marker
-                );
-
+                square.appendChild(marker);
             }
-
-
-            /*
-               Piece
-            */
 
             if(piece){
 
-                const element =
-                    document.createElement(
-                        "div"
-                    );
+                const element=
+                    document.createElement("div");
 
-
-                element.className =
-                    "piece " +
+                element.className=
+                    "piece "+
                     (
-                        piece.color === "w"
-                            ? "whitePiece"
-                            : "blackPiece"
+                        piece.color==="w"
+                            ?"whitePiece"
+                            :"blackPiece"
                     );
 
+                element.textContent=
+                    PIECES[piece.color][piece.type];
 
-                element.textContent =
-                    PIECES[
-                        piece.color
-                    ][
-                        piece.type
-                    ];
-
-
-                square.appendChild(
-                    element
-                );
-
+                square.appendChild(element);
             }
 
+            if(visualRow===7){
 
-            /*
-               Coordinates
-            */
+                const file=
+                    document.createElement("span");
 
-            if(visualRow === 7){
+                file.className="coord file";
+                file.textContent=FILES[c];
 
-                const file =
-                    document.createElement(
-                        "span"
-                    );
-
-                file.className =
-                    "coord file";
-
-                file.textContent =
-                    FILES[c];
-
-                square.appendChild(
-                    file
-                );
-
+                square.appendChild(file);
             }
 
+            if(visualCol===0){
 
-            if(visualCol === 0){
+                const rank=
+                    document.createElement("span");
 
-                const rank =
-                    document.createElement(
-                        "span"
-                    );
+                rank.className="coord rank";
+                rank.textContent=8-r;
 
-                rank.className =
-                    "coord rank";
-
-                rank.textContent =
-                    8-r;
-
-                square.appendChild(
-                    rank
-                );
-
+                square.appendChild(rank);
             }
-
 
             square.addEventListener(
                 "click",
                 handleSquareClick
             );
 
-
-            boardElement.appendChild(
-                square
-            );
-
+            boardElement.appendChild(square);
         }
-
     }
-
 }
-
 
 /* =========================================================
    BOARD INPUT
@@ -3527,126 +1972,74 @@ function renderBoard(){
 
 function handleSquareClick(event){
 
-    if(gameOver)
+    if(gameOver||aiThinking)
         return;
-
-
-    if(aiThinking)
-        return;
-
-
-    /*
-       Bot controls white only
-    */
 
     if(
-        gameMode === "bot" &&
-        turn === "b"
+        gameMode==="bot" &&
+        turn==="b"
     ){
-
         return;
-
     }
-
-
-    /*
-       Online controls own color
-    */
 
     if(
-        gameMode === "online" &&
-        onlineColor !== turn
+        gameMode==="online" &&
+        (
+            !onlineConnected ||
+            onlineColor!==turn
+        )
     ){
-
         return;
-
     }
 
+    const r=Number(
+        event.currentTarget.dataset.r
+    );
 
-    const r =
-        Number(
-            event.currentTarget.dataset.r
-        );
+    const c=Number(
+        event.currentTarget.dataset.c
+    );
 
-    const c =
-        Number(
-            event.currentTarget.dataset.c
-        );
-
-
-    const piece =
-        board[r][c];
-
-
-    /*
-       Nothing selected
-    */
+    const piece=board[r][c];
 
     if(!selectedSquare){
 
         if(
             piece &&
-            piece.color === turn
+            piece.color===turn
         ){
 
-            selectedSquare = {
-                r,
-                c
-            };
+            selectedSquare={r,c};
 
-            legalTargets =
-                getMovesFromSquare(
-                    r,
-                    c
-                );
+            legalTargets=
+                getMovesFromSquare(r,c);
 
             renderBoard();
-
         }
 
         return;
-
     }
-
-
-    /*
-       Selecting another own piece
-    */
 
     if(
         piece &&
-        piece.color === turn
+        piece.color===turn
     ){
 
-        selectedSquare = {
-            r,
-            c
-        };
+        selectedSquare={r,c};
 
-        legalTargets =
-            getMovesFromSquare(
-                r,
-                c
-            );
+        legalTargets=
+            getMovesFromSquare(r,c);
 
         renderBoard();
 
         return;
-
     }
 
-
-    /*
-       Find requested move
-    */
-
-    const move =
-        legalTargets.find(
-            candidate =>
-                candidate.to.r === r &&
-                candidate.to.c === c
+    const move=
+        legalTargets.find(candidate=>
+            candidate.to.r===r &&
+            candidate.to.c===c
         );
-
 
     if(!move){
 
@@ -3655,78 +2048,53 @@ function handleSquareClick(event){
         );
 
         return;
-
     }
-
-
-    /*
-       Promotion
-    */
 
     if(move.promotion){
 
-        pendingPromotion =
-            move;
+        pendingPromotion=move;
 
         $("promotionOverlay")
-            .classList
-            .add("show");
+            .classList.add("show");
 
         return;
-
     }
 
-
     makeMove(move);
-
 }
-
 
 /* =========================================================
    PROMOTION
    ========================================================= */
 
 document
-    .querySelectorAll(
-        "[data-promotion]"
-    )
-    .forEach(button => {
+.querySelectorAll("[data-promotion]")
+.forEach(button=>{
 
-        button.addEventListener(
-            "click",
-            () => {
+    button.addEventListener(
+        "click",
+        ()=>{
 
-                if(!pendingPromotion)
-                    return;
+            if(!pendingPromotion)
+                return;
 
+            const promotion=
+                button.dataset.promotion;
 
-                const promotion =
-                    button.dataset.promotion;
+            const move=pendingPromotion;
 
+            pendingPromotion=null;
 
-                const move =
-                    pendingPromotion;
+            $("promotionOverlay")
+                .classList.remove("show");
 
-
-                pendingPromotion =
-                    null;
-
-
-                $("promotionOverlay")
-                    .classList
-                    .remove("show");
-
-
-                makeMove(
-                    move,
-                    promotion
-                );
-
-            }
-        );
-
-    });
-
+            makeMove(
+                move,
+                promotion
+            );
+        }
+    );
+});
 
 /* =========================================================
    PANELS
@@ -3734,17 +2102,12 @@ document
 
 function updatePanels(){
 
-    $("moveCount")
-        .textContent =
+    $("moveCount").textContent=
         moveHistory.length;
 
+    const list=$("moveList");
 
-    const list =
-        $("moveList");
-
-
-    list.innerHTML = "";
-
+    list.innerHTML="";
 
     for(
         let i=0;
@@ -3752,124 +2115,87 @@ function updatePanels(){
         i+=2
     ){
 
-        const row =
-            document.createElement(
-                "div"
-            );
+        const row=
+            document.createElement("div");
 
+        row.className="moveRow";
 
-        row.className =
-            "moveRow";
+        const number=
+            document.createElement("div");
 
+        number.className="moveNumber";
+        number.textContent=i/2+1;
 
-        row.innerHTML = `
+        const white=
+            document.createElement("div");
 
-            <div class="moveNumber">
-                ${i/2+1}
-            </div>
+        white.textContent=
+            moveHistory[i]?.notation||"";
 
-            <div>
-                ${moveHistory[i]?.notation || ""}
-            </div>
+        const black=
+            document.createElement("div");
 
-            <div>
-                ${moveHistory[i+1]?.notation || ""}
-            </div>
+        black.textContent=
+            moveHistory[i+1]?.notation||"";
 
-        `;
-
+        row.append(
+            number,
+            white,
+            black
+        );
 
         list.appendChild(row);
-
     }
 
-
-    $("captured")
-        .textContent =
+    $("captured").textContent=
         capturedPieces
-            .map(piece =>
-                PIECES[
-                    piece.color
-                ][
-                    piece.type
-                ]
+            .map(p=>
+                PIECES[p.color][p.type]
             )
             .join(" ");
 
+    let whiteMaterial=0;
+    let blackMaterial=0;
 
-    let whiteMaterial = 0;
+    capturedPieces.forEach(piece=>{
 
-    let blackMaterial = 0;
-
-
-    capturedPieces.forEach(
-        piece => {
-
-            if(piece.color === "w"){
-
-                whiteMaterial +=
-                    VALUES[piece.type];
-
-            }
-            else{
-
-                blackMaterial +=
-                    VALUES[piece.type];
-
-            }
-
-        }
-    );
-
+        if(piece.color==="w")
+            whiteMaterial+=VALUES[piece.type];
+        else
+            blackMaterial+=VALUES[piece.type];
+    });
 
     if(
-        whiteMaterial ===
+        whiteMaterial===
         blackMaterial
     ){
 
-        $("material")
-            .textContent =
+        $("material").textContent=
             "Material: Even";
 
-    }
-    else{
+    }else{
 
-        const side =
-            whiteMaterial >
-            blackMaterial
-                ? "White"
-                : "Black";
+        const side=
+            whiteMaterial>blackMaterial
+                ?"White"
+                :"Black";
 
-
-        const difference =
+        const difference=
             Math.round(
                 Math.abs(
-                    whiteMaterial -
+                    whiteMaterial-
                     blackMaterial
-                ) / 100
+                )/100
             );
 
-
-        $("material")
-            .textContent =
+        $("material").textContent=
             `Material: ${side} +${difference}`;
-
     }
-
 }
-
-
-/* =========================================================
-   STATUS
-   ========================================================= */
 
 function setStatus(text){
-
-    $("status")
-        .textContent = text;
-
+    $("status").textContent=text;
 }
-
 
 /* =========================================================
    CLOCK
@@ -3877,162 +2203,130 @@ function setStatus(text){
 
 function formatTime(seconds){
 
-    seconds =
-        Math.max(
-            0,
-            seconds
-        );
+    seconds=Math.max(0,seconds);
 
+    const minutes=
+        Math.floor(seconds/60);
 
-    const minutes =
-        Math.floor(
-            seconds / 60
-        );
+    const remaining=
+        seconds%60;
 
-
-    const remaining =
-        seconds % 60;
-
-
-    return (
-        String(minutes)
-            .padStart(2,"0")
-        +
-        ":"
-        +
-        String(remaining)
-            .padStart(2,"0")
+    return(
+        String(minutes).padStart(2,"0")+
+        ":"+
+        String(remaining).padStart(2,"0")
     );
-
 }
-
 
 function updateClocks(){
 
-    $("whiteClock")
-        .textContent =
-        formatTime(
-            whiteTime
-        );
+    $("whiteClock").textContent=
+        formatTime(whiteTime);
 
-
-    $("blackClock")
-        .textContent =
-        formatTime(
-            blackTime
-        );
-
+    $("blackClock").textContent=
+        formatTime(blackTime);
 
     $("whiteClock")
         .classList
         .toggle(
             "active",
-            turn === "w" &&
-            !gameOver
+            turn==="w"&&!gameOver
         );
-
 
     $("blackClock")
         .classList
         .toggle(
             "active",
-            turn === "b" &&
-            !gameOver
+            turn==="b"&&!gameOver
         );
-
 
     $("whiteClock")
         .classList
         .toggle(
             "low",
-            whiteTime <= 20
+            whiteTime<=20
         );
-
 
     $("blackClock")
         .classList
         .toggle(
             "low",
-            blackTime <= 20
+            blackTime<=20
         );
-
 }
-
 
 function startClock(){
 
-    clearInterval(
-        timerInterval
-    );
-
+    clearInterval(timerInterval);
 
     if(gameOver)
         return;
 
+    timerInterval=
+        setInterval(()=>{
 
-    timerInterval =
-        setInterval(
-            () => {
+            if(gameMode==="online"&&!onlineConnected)
+                return;
 
-                if(turn === "w"){
+            if(turn==="w"){
 
-                    whiteTime--;
+                whiteTime--;
 
-                    if(
-                        whiteTime <= 0
-                    ){
+                if(whiteTime<=0){
 
-                        whiteTime = 0;
+                    whiteTime=0;
 
-                        updateClocks();
+                    updateClocks();
 
-                        finishGame(
-                            "Black wins!",
-                            "White ran out of time.",
-                            "⏱️"
-                        );
-
-                        return;
-
+                    if(gameMode==="online"){
+                        sendPeerMessage({
+                            type:"timeout",
+                            color:"w"
+                        });
                     }
 
+                    finishGame(
+                        "Black wins!",
+                        "White ran out of time.",
+                        "⏱️"
+                    );
+
+                    return;
                 }
-                else{
 
-                    blackTime--;
+            }else{
 
-                    if(
-                        blackTime <= 0
-                    ){
+                blackTime--;
 
-                        blackTime = 0;
+                if(blackTime<=0){
 
-                        updateClocks();
+                    blackTime=0;
 
-                        finishGame(
-                            "White wins!",
-                            "Black ran out of time.",
-                            "⏱️"
-                        );
+                    updateClocks();
 
-                        return;
-
+                    if(gameMode==="online"){
+                        sendPeerMessage({
+                            type:"timeout",
+                            color:"b"
+                        });
                     }
 
+                    finishGame(
+                        "White wins!",
+                        "Black ran out of time.",
+                        "⏱️"
+                    );
+
+                    return;
                 }
+            }
 
+            updateClocks();
 
-                updateClocks();
-
-            },
-            1000
-        );
-
+        },1000);
 
     updateClocks();
-
 }
-
 
 /* =========================================================
    NEW GAME
@@ -4040,82 +2334,58 @@ function startClock(){
 
 function newGame(){
 
-    board =
-        createStartingBoard();
+    board=createStartingBoard();
 
+    turn="w";
 
-    turn = "w";
+    selectedSquare=null;
+    legalTargets=[];
 
-    selectedSquare = null;
+    moveHistory=[];
+    undoHistory=[];
+    capturedPieces=[];
 
-    legalTargets = [];
-
-    moveHistory = [];
-
-    undoHistory = [];
-
-    capturedPieces = [];
-
-    castling = {
-
+    castling={
         wK:true,
         wQ:true,
-
         bK:true,
         bQ:true
-
     };
 
-    enPassant = null;
+    enPassant=null;
 
-    lastMove = null;
+    lastMove=null;
+    pendingPromotion=null;
 
-    pendingPromotion = null;
+    gameOver=false;
+    aiThinking=false;
 
-    gameOver = false;
+    const time=
+        Number($("timeControl").value);
 
-    aiThinking = false;
-
-
-    const time =
-        Number(
-            $("timeControl").value
-        );
-
-
-    whiteTime = time;
-
-    blackTime = time;
-
+    whiteTime=time;
+    blackTime=time;
 
     $("gameOverOverlay")
-        .classList
-        .remove("show");
-
+        .classList.remove("show");
 
     $("promotionOverlay")
-        .classList
-        .remove("show");
-
+        .classList.remove("show");
 
     updateNames();
-
     renderBoard();
-
     updatePanels();
 
     setStatus(
-        gameMode === "online"
-            ? "Create or join an online game."
-            : "White to move."
+        gameMode==="online"
+            ?"Create or join an online game."
+            :"White to move."
     );
 
     startClock();
 
     saveGame();
-
 }
-
 
 /* =========================================================
    UNDO
@@ -4123,135 +2393,92 @@ function newGame(){
 
 function undoMove(){
 
-    if(gameMode === "online"){
+    if(gameMode==="online"){
 
         showToast(
             "Undo is disabled in online games."
         );
 
         return;
-
     }
 
-
-    if(
-        undoHistory.length === 0
-    ){
+    if(!undoHistory.length){
 
         showToast(
             "Nothing to undo."
         );
 
         return;
-
     }
 
-
-    /*
-       In bot mode undo both
-       player + bot moves.
-    */
-
-    let amount =
-        gameMode === "bot" &&
-        moveHistory.length >= 2
-            ? 2
-            : 1;
-
+    let amount=
+        gameMode==="bot" &&
+        moveHistory.length>=2
+            ?2
+            :1;
 
     while(
-        amount-- > 0 &&
+        amount-->0 &&
         undoHistory.length
     ){
 
-        const state =
+        const state=
             undoHistory.pop();
 
+        board=cloneBoard(state.board);
+        turn=state.turn;
+        castling={...state.castling};
 
-        board =
-            cloneBoard(
-                state.board
-            );
-
-
-        turn =
-            state.turn;
-
-
-        castling =
-            {
-                ...state.castling
-            };
-
-
-        enPassant =
+        enPassant=
             state.enPassant
-                ? {...state.enPassant}
-                : null;
+                ?{...state.enPassant}
+                :null;
 
+        whiteTime=state.whiteTime;
+        blackTime=state.blackTime;
 
-        whiteTime =
-            state.whiteTime;
+        moveHistory=
+            state.moveHistory.map(x=>({
+                ...x,
+                move:x.move?cloneMove(x.move):null
+            }));
 
+        capturedPieces=
+            state.capturedPieces.map(x=>({...x}));
 
-        blackTime =
-            state.blackTime;
-
-
-        moveHistory =
-            state.moveHistory
-                .map(x => ({...x}));
-
-
-        capturedPieces =
-            state.capturedPieces
-                .map(x => ({...x}));
-
-
-        lastMove =
-            state.lastMove;
-
+        lastMove=
+            state.lastMove
+                ?{...state.lastMove}
+                :null;
     }
 
-
-    gameOver = false;
-
-    selectedSquare = null;
-
-    legalTargets = [];
-
+    gameOver=false;
+    selectedSquare=null;
+    legalTargets=[];
 
     renderBoard();
-
     updatePanels();
-
     updateClocks();
 
     setStatus(
-        `${turn === "w" ? "White" : "Black"} to move.`
+        `${turn==="w"?"White":"Black"} to move.`
     );
 
     startClock();
-
     saveGame();
-
 }
 
-
 /* =========================================================
-   FLIP BOARD
+   FLIP
    ========================================================= */
 
 function flipBoard(){
 
-    flipped = !flipped;
+    flipped=!flipped;
 
     renderBoard();
-
     saveGame();
-
 }
-
 
 /* =========================================================
    GAME OVER
@@ -4263,236 +2490,94 @@ function finishGame(
     icon
 ){
 
-    gameOver = true;
+    if(gameOver)
+        return;
 
-    clearInterval(
-        timerInterval
-    );
+    gameOver=true;
 
+    clearInterval(timerInterval);
 
-    $("gameOverIcon")
-        .textContent = icon;
-
-
-    $("gameOverTitle")
-        .textContent = title;
-
-
-    $("gameOverText")
-        .textContent = text;
-
+    $("gameOverIcon").textContent=icon;
+    $("gameOverTitle").textContent=title;
+    $("gameOverText").textContent=text;
 
     $("gameOverOverlay")
-        .classList
-        .add("show");
-
+        .classList.add("show");
 
     updateClocks();
-
     saveGame();
-
 }
 
-
 /* =========================================================
-   BOT EVALUATION
+   BOT
    ========================================================= */
 
 function evaluateBoard(b){
 
-    let score = 0;
+    let score=0;
 
+    for(let r=0;r<8;r++){
 
-    /*
-       Material
-    */
+        for(let c=0;c<8;c++){
 
-    for(
-        let r=0;
-        r<8;
-        r++
-    ){
-
-        for(
-            let c=0;
-            c<8;
-            c++
-        ){
-
-            const piece =
-                b[r][c];
-
+            const piece=b[r][c];
 
             if(!piece)
                 continue;
 
+            let value=VALUES[piece.type];
 
-            let value =
-                VALUES[
-                    piece.type
-                ];
+            if(piece.type==="p"){
 
-
-            /*
-               Basic pawn advancement
-            */
-
-            if(
-                piece.type === "p"
-            ){
-
-                if(
-                    piece.color === "b"
-                ){
-
-                    value +=
-                        r * 7;
-
-                }
-                else{
-
-                    value +=
-                        (7-r) * 7;
-
-                }
-
+                if(piece.color==="b")
+                    value+=r*7;
+                else
+                    value+=(7-r)*7;
             }
 
-
-            /*
-               Center control
-            */
-
             if(
-                (
-                    r === 3 ||
-                    r === 4
-                ) &&
-                (
-                    c === 3 ||
-                    c === 4
-                )
+                (r===3||r===4)&&
+                (c===3||c===4)
             ){
-
-                value += 20;
-
+                value+=20;
             }
 
-
-            /*
-               Mobility-ish bonus
-            */
-
             if(
-                piece.type === "n" ||
-                piece.type === "b"
+                piece.type==="n"||
+                piece.type==="b"
             ){
-
-                value += 4;
-
+                value+=4;
             }
 
-
-            score +=
-                piece.color === "b"
-                    ? value
-                    : -value;
-
+            score+=
+                piece.color==="b"
+                    ?value
+                    :-value;
         }
-
     }
 
+    if(isInCheck(b,"w"))
+        score+=35;
 
-    /*
-       Check bonus
-    */
-
-    if(
-        isInCheck(
-            b,
-            "w"
-        )
-    ){
-
-        score += 35;
-
-    }
-
-
-    if(
-        isInCheck(
-            b,
-            "b"
-        )
-    ){
-
-        score -= 35;
-
-    }
-
+    if(isInCheck(b,"b"))
+        score-=35;
 
     return score;
-
 }
 
+function orderMoves(moves,b){
 
-/* =========================================================
-   MOVE ORDERING
-   ========================================================= */
+    return moves.slice().sort((a,z)=>{
 
-function orderMoves(
-    moves,
-    b
-){
+        const ca=b[a.to.r][a.to.c];
+        const cz=b[z.to.r][z.to.c];
 
-    return moves
-        .slice()
-        .sort(
-            (a,z) => {
+        const va=ca?VALUES[ca.type]:0;
+        const vz=cz?VALUES[cz.type]:0;
 
-                const capturedA =
-                    b[
-                        a.to.r
-                    ][
-                        a.to.c
-                    ];
-
-
-                const capturedZ =
-                    b[
-                        z.to.r
-                    ][
-                        z.to.c
-                    ];
-
-
-                const valueA =
-                    capturedA
-                        ? VALUES[
-                            capturedA.type
-                        ]
-                        : 0;
-
-
-                const valueZ =
-                    capturedZ
-                        ? VALUES[
-                            capturedZ.type
-                        ]
-                        : 0;
-
-
-                return valueZ - valueA;
-
-            }
-        );
-
+        return vz-va;
+    });
 }
-
-
-/* =========================================================
-   MINIMAX
-   ========================================================= */
 
 function minimax(
     b,
@@ -4502,76 +2587,44 @@ function minimax(
     beta
 ){
 
-    const moves =
+    const moves=
         generateLegalMoves(
             b,
             color
         );
 
+    if(!moves.length){
 
-    if(
-        moves.length === 0
-    ){
+        if(isInCheck(b,color)){
 
-        if(
-            isInCheck(
-                b,
-                color
-            )
-        ){
-
-            return color === "b"
-                ? -999999
-                : 999999;
-
+            return color==="b"
+                ?-999999
+                :999999;
         }
 
-
         return 0;
-
     }
 
-
-    if(depth <= 0){
-
+    if(depth<=0)
         return evaluateBoard(b);
 
-    }
+    const ordered=
+        orderMoves(moves,b);
 
+    if(color==="b"){
 
-    const ordered =
-        orderMoves(
-            moves,
-            b
-        );
+        let best=-Infinity;
 
+        for(const move of ordered){
 
-    /*
-       Black maximizes
-    */
-
-    if(color === "b"){
-
-        let best =
-            -Infinity;
-
-
-        for(
-            const move
-            of ordered
-        ){
-
-            const next =
+            const next=
                 applyMove(
                     b,
                     move,
-                    move.promotion
-                        ? "q"
-                        : null
+                    move.promotion?"q":null
                 );
 
-
-            const score =
+            const score=
                 minimax(
                     next,
                     "w",
@@ -4580,56 +2633,28 @@ function minimax(
                     beta
                 );
 
+            best=Math.max(best,score);
+            alpha=Math.max(alpha,score);
 
-            best =
-                Math.max(
-                    best,
-                    score
-                );
-
-
-            alpha =
-                Math.max(
-                    alpha,
-                    score
-                );
-
-
-            if(beta <= alpha)
+            if(beta<=alpha)
                 break;
-
         }
 
-
         return best;
-
     }
 
+    let best=Infinity;
 
-    /*
-       White minimizes
-    */
+    for(const move of ordered){
 
-    let best =
-        Infinity;
-
-
-    for(
-        const move
-        of ordered
-    ){
-
-        const next =
+        const next=
             applyMove(
                 b,
                 move,
-                move.promotion
-                    ? "q"
-                    : null
+                move.promotion?"q":null
             );
 
-
-        const score =
+        const score=
             minimax(
                 next,
                 "b",
@@ -4638,207 +2663,120 @@ function minimax(
                 beta
             );
 
+        best=Math.min(best,score);
+        beta=Math.min(beta,score);
 
-        best =
-            Math.min(
-                best,
-                score
-            );
-
-
-        beta =
-            Math.min(
-                beta,
-                score
-            );
-
-
-        if(beta <= alpha)
+        if(beta<=alpha)
             break;
-
     }
 
-
     return best;
-
 }
-
-
-/* =========================================================
-   COMPUTER MOVE
-   ========================================================= */
 
 function computerMove(){
 
-    aiThinking = true;
+    aiThinking=true;
 
     setStatus(
         "Computer is thinking…"
     );
 
+    setTimeout(()=>{
 
-    setTimeout(
-        () => {
+        if(
+            gameOver||
+            turn!=="b"
+        ){
 
-            if(
-                gameOver ||
-                turn !== "b"
-            ){
+            aiThinking=false;
+            return;
+        }
 
-                aiThinking = false;
+        const moves=
+            generateLegalMoves(
+                board,
+                "b"
+            );
 
-                return;
+        if(!moves.length){
 
-            }
+            aiThinking=false;
+            return;
+        }
 
+        let selectedMove=
+            moves[
+                Math.floor(
+                    Math.random()*moves.length
+                )
+            ];
 
-            const moves =
-                generateLegalMoves(
-                    board,
-                    "b"
-                );
+        if(difficulty===1){
 
-
-            if(
-                moves.length === 0
-            ){
-
-                aiThinking = false;
-
-                return;
-
-            }
-
-
-            let selectedMove =
+            selectedMove=
                 moves[
                     Math.floor(
-                        Math.random() *
-                        moves.length
+                        Math.random()*moves.length
                     )
                 ];
 
+        }else{
 
-            /*
-               Easy
-            */
+            let depth;
 
-            if(
-                difficulty === 1
+            if(difficulty===2)
+                depth=1;
+            else if(difficulty===3)
+                depth=2;
+            else
+                depth=3;
+
+            let bestScore=-Infinity;
+
+            for(
+                const move of
+                orderMoves(moves,board)
             ){
 
-                selectedMove =
-                    moves[
-                        Math.floor(
-                            Math.random() *
-                            moves.length
-                        )
-                    ];
+                const next=
+                    applyMove(
+                        board,
+                        move,
+                        move.promotion?"q":null
+                    );
 
+                const score=
+                    minimax(
+                        next,
+                        "w",
+                        depth-1,
+                        -Infinity,
+                        Infinity
+                    );
+
+                if(score>bestScore){
+
+                    bestScore=score;
+                    selectedMove=move;
+                }
             }
-            else{
+        }
 
-                let depth;
+        aiThinking=false;
 
+        makeMove(
+            selectedMove,
+            selectedMove.promotion?"q":null
+        );
 
-                if(
-                    difficulty === 2
-                ){
-
-                    depth = 1;
-
-                }
-                else if(
-                    difficulty === 3
-                ){
-
-                    depth = 2;
-
-                }
-                else{
-
-                    depth = 3;
-
-                }
-
-
-                let bestScore =
-                    -Infinity;
-
-
-                for(
-                    const move
-                    of orderMoves(
-                        moves,
-                        board
-                    )
-                ){
-
-                    const next =
-                        applyMove(
-                            board,
-                            move,
-                            move.promotion
-                                ? "q"
-                                : null
-                        );
-
-
-                    const score =
-                        minimax(
-                            next,
-                            "w",
-                            depth-1,
-                            -Infinity,
-                            Infinity
-                        );
-
-
-                    if(
-                        score >
-                        bestScore
-                    ){
-
-                        bestScore =
-                            score;
-
-                        selectedMove =
-                            move;
-
-                    }
-
-                }
-
-            }
-
-
-            aiThinking = false;
-
-
-            makeMove(
-                selectedMove,
-                selectedMove.promotion
-                    ? "q"
-                    : null
-            );
-
-        },
-        Math.max(
-            250,
-            850 -
-            difficulty * 130
-        )
-    );
-
+    },Math.max(250,850-difficulty*130));
 }
-
 
 /* =========================================================
    SOUND
    ========================================================= */
 
-let audioContext = null;
-
+let audioContext=null;
 
 function playSound(type){
 
@@ -4846,85 +2784,51 @@ function playSound(type){
 
         if(!audioContext){
 
-            audioContext =
-                new (
-                    window.AudioContext ||
+            audioContext=
+                new(
+                    window.AudioContext||
                     window.webkitAudioContext
                 )();
-
         }
 
+        const oscillator=
+            audioContext.createOscillator();
 
-        const oscillator =
-            audioContext
-                .createOscillator();
-
-
-        const gain =
-            audioContext
-                .createGain();
-
+        const gain=
+            audioContext.createGain();
 
         oscillator.connect(gain);
+        gain.connect(audioContext.destination);
 
-        gain.connect(
-            audioContext.destination
-        );
+        if(type==="capture")
+            oscillator.frequency.value=190;
+        else if(type==="check")
+            oscillator.frequency.value=720;
+        else
+            oscillator.frequency.value=420;
 
-
-        if(type === "capture"){
-
-            oscillator.frequency.value =
-                190;
-
-        }
-        else if(type === "check"){
-
-            oscillator.frequency.value =
-                720;
-
-        }
-        else{
-
-            oscillator.frequency.value =
-                420;
-
-        }
-
-
-        gain.gain.value = .055;
-
+        gain.gain.value=.055;
 
         oscillator.start();
 
-
         oscillator.stop(
-            audioContext.currentTime +
-            (
-                type === "check"
-                    ? .15
-                    : .075
-            )
+            audioContext.currentTime+
+            (type==="check"? .15:.075)
         );
 
-    }
-    catch(error){
-
-        /*
-           Browser audio may be blocked
-           until the user interacts.
-        */
-
-    }
-
+    }catch(e){}
 }
 
-
 /* =========================================================
-   LOCAL SAVE
+   SAVE / LOAD
    ========================================================= */
 
 function saveGame(){
+
+    /*
+       Do not save active PeerJS connections.
+       Online connections are temporary.
+    */
 
     try{
 
@@ -4933,98 +2837,64 @@ function saveGame(){
             JSON.stringify({
 
                 board,
-
                 turn,
-
                 moveHistory,
-
                 undoHistory,
-
                 capturedPieces,
-
                 castling,
-
                 enPassant,
-
                 whiteTime,
-
                 blackTime,
-
                 flipped,
-
-                gameMode,
-
+                gameMode:
+                    gameMode==="online"
+                        ?"bot"
+                        :gameMode,
                 difficulty,
-
                 lastMove
-
             })
         );
 
-    }
-    catch(error){
+    }catch(e){
 
         console.warn(
             "Could not save game."
         );
-
     }
-
 }
-
-
-/* =========================================================
-   LOAD SAVE
-   ========================================================= */
 
 function loadGame(){
 
     try{
 
-        const saved =
+        const saved=
             JSON.parse(
                 localStorage.getItem(
                     "chessArenaSave"
                 )
             );
 
-
         if(
-            !saved ||
+            !saved||
             !saved.board
         ){
-
             return false;
-
         }
 
+        board=saved.board;
+        turn=saved.turn||"w";
 
-        board =
-            saved.board;
+        moveHistory=
+            saved.moveHistory||[];
 
+        undoHistory=
+            saved.undoHistory||[];
 
-        turn =
-            saved.turn ||
-            "w";
+        capturedPieces=
+            saved.capturedPieces||[];
 
-
-        moveHistory =
-            saved.moveHistory ||
-            [];
-
-
-        undoHistory =
-            saved.undoHistory ||
-            [];
-
-
-        capturedPieces =
-            saved.capturedPieces ||
-            [];
-
-
-        castling =
-            saved.castling ||
+        castling=
+            saved.castling||
             {
                 wK:true,
                 wQ:true,
@@ -5032,160 +2902,93 @@ function loadGame(){
                 bQ:true
             };
 
+        enPassant=
+            saved.enPassant||null;
 
-        enPassant =
-            saved.enPassant ||
-            null;
+        whiteTime=
+            saved.whiteTime??600;
 
+        blackTime=
+            saved.blackTime??600;
 
-        whiteTime =
-            saved.whiteTime ??
-            600;
+        flipped=!!saved.flipped;
 
+        gameMode=
+            saved.gameMode||"bot";
 
-        blackTime =
-            saved.blackTime ??
-            600;
+        difficulty=
+            saved.difficulty||2;
 
-
-        flipped =
-            !!saved.flipped;
-
-
-        gameMode =
-            saved.gameMode ||
-            "bot";
-
-
-        difficulty =
-            saved.difficulty ||
-            2;
-
-
-        lastMove =
-            saved.lastMove ||
-            null;
-
+        lastMove=
+            saved.lastMove||null;
 
         updateModeButtons();
-
         updateNames();
-
         renderBoard();
-
         updatePanels();
-
         updateClocks();
-
         startClock();
-
 
         return true;
 
-    }
-    catch(error){
+    }catch(e){
 
         return false;
-
     }
-
 }
 
-
 /* =========================================================
-   PLAYER NAMES
+   NAMES
    ========================================================= */
 
 function updateNames(){
 
-    if(
-        gameMode === "bot"
-    ){
+    if(gameMode==="bot"){
 
-        $("blackName")
-            .textContent =
-            "Computer";
+        $("blackName").textContent="Computer";
+        $("blackSub").textContent="Black • Bot";
 
-        $("blackSub")
-            .textContent =
-            "Black • Bot";
+        $("whiteName").textContent="You";
+        $("whiteSub").textContent="White";
 
-        $("whiteName")
-            .textContent =
-            "You";
-
-        $("whiteSub")
-            .textContent =
-            "White";
-
-        $("blackAvatar")
-            .textContent =
-            "🤖";
-
+        $("blackAvatar").textContent="🤖";
     }
 
+    if(gameMode==="local"){
 
-    if(
-        gameMode === "local"
-    ){
+        $("blackName").textContent="Player 2";
+        $("blackSub").textContent="Black • Local";
 
-        $("blackName")
-            .textContent =
-            "Player 2";
+        $("whiteName").textContent="Player 1";
+        $("whiteSub").textContent="White";
 
-        $("blackSub")
-            .textContent =
-            "Black • Local";
-
-        $("whiteName")
-            .textContent =
-            "Player 1";
-
-        $("whiteSub")
-            .textContent =
-            "White";
-
-        $("blackAvatar")
-            .textContent =
-            "♟️";
-
+        $("blackAvatar").textContent="♟️";
     }
 
+    if(gameMode==="online"){
 
-    if(
-        gameMode === "online"
-    ){
+        $("blackName").textContent=
+            onlineColor==="b"
+                ?"You"
+                :"Opponent";
 
-        $("blackName")
-            .textContent =
-            onlineColor === "b"
-                ? "You"
-                : "Opponent";
+        $("whiteName").textContent=
+            onlineColor==="w"
+                ?"You"
+                :"Opponent";
 
-        $("whiteName")
-            .textContent =
-            onlineColor === "w"
-                ? "You"
-                : "Opponent";
-
-        $("blackSub")
-            .textContent =
+        $("blackSub").textContent=
             "Black • Online";
 
-        $("whiteSub")
-            .textContent =
+        $("whiteSub").textContent=
             "White • Online";
 
-        $("blackAvatar")
-            .textContent =
-            onlineColor === "b"
-                ? "♟️"
-                : "🌐";
-
+        $("blackAvatar").textContent=
+            onlineColor==="b"
+                ?"♟️"
+                :"🌐";
     }
-
 }
-
 
 /* =========================================================
    MODE BUTTONS
@@ -5197,615 +3000,635 @@ function updateModeButtons(){
         .classList
         .toggle(
             "active",
-            gameMode === "bot"
+            gameMode==="bot"
         );
-
 
     $("localMode")
         .classList
         .toggle(
             "active",
-            gameMode === "local"
+            gameMode==="local"
         );
-
 
     $("onlineMode")
         .classList
         .toggle(
             "active",
-            gameMode === "online"
+            gameMode==="online"
         );
-
 
     $("difficulty")
         .classList
         .toggle(
             "hidden",
-            gameMode !== "bot"
+            gameMode!=="bot"
         );
-
 }
 
-
 /* =========================================================
-   ONLINE SERVER CONNECTION
+   PEERJS
    ========================================================= */
 
-function connectToServer(){
+function generatePeerCode(){
 
-    if(
-        socket &&
-        socket.readyState === WebSocket.OPEN
-    ){
+    const chars=
+        "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
-        return;
+    let code="";
 
+    for(let i=0;i<6;i++){
+
+        code+=
+            chars[
+                Math.floor(
+                    Math.random()*chars.length
+                )
+            ];
     }
 
+    return code;
+}
+
+/*
+   Send JSON through PeerJS.
+*/
+
+function sendPeerMessage(data){
+
+    if(
+        !onlineConnection||
+        !onlineConnection.open
+    ){
+
+        showToast(
+            "Opponent is not connected."
+        );
+
+        return false;
+    }
 
     try{
 
-        socket =
-            new WebSocket(
-                SERVER_URL
+        onlineConnection.send(data);
+
+        return true;
+
+    }catch(error){
+
+        console.error(error);
+
+        showToast(
+            "Could not send online data."
+        );
+
+        return false;
+    }
+}
+
+/*
+   Start PeerJS.
+
+   Host:
+      startPeer(sixCharacterCode)
+
+   Guest:
+      startPeer()
+*/
+
+function startPeer(id=null){
+
+    if(peerStarting)
+        return;
+
+    peerStarting=true;
+
+    if(peer){
+
+        try{
+            peer.destroy();
+        }catch(e){}
+
+        peer=null;
+    }
+
+    onlineConnected=false;
+
+    try{
+
+        peer=
+            id
+                ?new Peer(
+                    id,
+                    {debug:2}
+                )
+                :new Peer(
+                    {debug:2}
+                );
+
+    }catch(error){
+
+        peerStarting=false;
+
+        console.error(error);
+
+        showToast(
+            "Could not start PeerJS."
+        );
+
+        return;
+    }
+
+    peer.on(
+        "open",
+        peerId=>{
+
+            peerStarting=false;
+
+            /*
+               For the host, peerId is the
+               invite code.
+
+               For the guest, it is just our
+               private temporary PeerJS ID.
+            */
+
+            if(onlineHost){
+
+                onlineCode=
+                    peerId.toUpperCase();
+
+                $("inviteCode")
+                    .textContent=
+                    onlineCode;
+
+                $("connectionStatus")
+                    .textContent=
+                    "Waiting for opponent…";
+
+                updateNames();
+            }else{
+
+                $("connectionStatus")
+                    .textContent=
+                    "Connecting to host…";
+            }
+        }
+    );
+
+    /*
+       Host receives connection.
+    */
+
+    peer.on(
+        "connection",
+        connection=>{
+
+            if(!onlineHost){
+
+                connection.close();
+                return;
+            }
+
+            if(onlineConnection){
+
+                connection.close();
+                return;
+            }
+
+            onlineConnection=connection;
+
+            setupPeerConnection(
+                connection
+            );
+        }
+    );
+
+    peer.on(
+        "error",
+        error=>{
+
+            console.error(
+                "PeerJS error:",
+                error
             );
 
+            peerStarting=false;
 
-        socket.onopen = () => {
+            if(
+                error.type==="unavailable-id"
+            ){
 
-            onlineConnected = true;
+                if(onlineHost){
+
+                    showToast(
+                        "Invite code collision. Creating another…"
+                    );
+
+                    setTimeout(
+                        ()=>{
+                            startPeer(
+                                generatePeerCode()
+                            );
+                        },
+                        250
+                    );
+                }
+
+                return;
+            }
+
+            if(
+                error.type==="peer-unavailable"
+            ){
+
+                onlineConnected=false;
+
+                $("connectionStatus")
+                    .textContent=
+                    "Game not found.";
+
+                showToast(
+                    "That invite code was not found."
+                );
+
+                return;
+            }
 
             $("connectionStatus")
-                .textContent =
-                "Connected to server.";
+                .textContent=
+                "PeerJS connection error.";
 
             showToast(
-                "Connected to online server."
+                "Online connection error."
+            );
+        }
+    );
+
+    peer.on(
+        "disconnected",
+        ()=>{
+
+            onlineConnected=false;
+
+            if(gameMode==="online"){
+
+                $("connectionStatus")
+                    .textContent=
+                    "Disconnected from PeerJS.";
+            }
+        }
+    );
+
+    peer.on(
+        "close",
+        ()=>{
+
+            onlineConnected=false;
+        }
+    );
+}
+
+/*
+   Setup data connection.
+*/
+
+function setupPeerConnection(connection){
+
+    onlineConnection=connection;
+
+    connection.on(
+        "open",
+        ()=>{
+
+            onlineConnected=true;
+
+            $("connectionStatus")
+                .textContent=
+                onlineHost
+                    ?"Opponent connected!"
+                    :"Connected to opponent!";
+
+            updateNames();
+
+            showToast(
+                "Online game connected!"
             );
 
-        };
+            /*
+               Host sends authoritative
+               initial state.
+            */
 
+            if(onlineHost){
 
-        socket.onclose = () => {
+                sendGameSync();
 
-            onlineConnected = false;
+            }else{
+
+                setStatus(
+                    onlineColor===turn
+                        ?"Your turn."
+                        :"Opponent's turn."
+                );
+            }
+
+            updateNames();
+        }
+    );
+
+    connection.on(
+        "data",
+        data=>{
+
+            handlePeerMessage(data);
+        }
+    );
+
+    connection.on(
+        "close",
+        ()=>{
+
+            onlineConnected=false;
 
             $("connectionStatus")
-                .textContent =
-                "Disconnected from server.";
+                .textContent=
+                "Opponent disconnected.";
 
-        };
+            if(
+                !gameOver&&
+                gameMode==="online"
+            ){
 
+                finishGame(
+                    "You win!",
+                    "Your opponent disconnected.",
+                    "📡"
+                );
+            }
+        }
+    );
 
-        socket.onerror = () => {
+    connection.on(
+        "error",
+        error=>{
+
+            console.error(
+                "Peer connection error:",
+                error
+            );
+
+            onlineConnected=false;
 
             $("connectionStatus")
-                .textContent =
+                .textContent=
                 "Connection error.";
+        }
+    );
+}
 
+/*
+   Guest connects to host's six-character Peer ID.
+*/
+
+function connectToHost(code){
+
+    if(!peer){
+
+        showToast(
+            "PeerJS is not ready."
+        );
+
+        return;
+    }
+
+    $("connectionStatus")
+        .textContent=
+        "Connecting to opponent…";
+
+    try{
+
+        const connection=
+            peer.connect(
+                code,
+                {
+                    reliable:true,
+                    serialization:"json"
+                }
+            );
+
+        setupPeerConnection(
+            connection
+        );
+
+    }catch(error){
+
+        console.error(error);
+
+        showToast(
+            "Could not connect to that game."
+        );
+    }
+}
+
+/* =========================================================
+   STATE SYNC
+   ========================================================= */
+
+function createGameState(){
+
+    return {
+
+        type:"sync",
+
+        board:cloneBoard(board),
+
+        turn,
+
+        castling:{
+            ...castling
+        },
+
+        enPassant:
+            enPassant
+                ?{...enPassant}
+                :null,
+
+        whiteTime,
+        blackTime,
+
+        moveHistory:
+            moveHistory.map(x=>({
+                ...x,
+                move:x.move
+                    ?cloneMove(x.move)
+                    :null
+            })),
+
+        capturedPieces:
+            capturedPieces.map(x=>({...x})),
+
+        lastMove:
+            lastMove
+                ?{
+                    from:{...lastMove.from},
+                    to:{...lastMove.to}
+                }
+                :null
+    };
+}
+
+function sendGameSync(){
+
+    if(!onlineConnected)
+        return;
+
+    sendPeerMessage(
+        createGameState()
+    );
+}
+
+function receiveGameSync(message){
+
+    if(!message.board)
+        return;
+
+    board=cloneBoard(message.board);
+
+    turn=message.turn||"w";
+
+    castling=
+        message.castling||
+        {
+            wK:true,
+            wQ:true,
+            bK:true,
+            bQ:true
         };
 
+    enPassant=
+        message.enPassant
+            ?{...message.enPassant}
+            :null;
 
-        socket.onmessage =
-            event => {
+    whiteTime=
+        Number(message.whiteTime);
 
-                try{
+    blackTime=
+        Number(message.blackTime);
 
-                    handleServerMessage(
-                        JSON.parse(
-                            event.data
-                        )
-                    );
+    if(!Number.isFinite(whiteTime))
+        whiteTime=600;
 
-                }
-                catch(error){
+    if(!Number.isFinite(blackTime))
+        blackTime=600;
 
-                    console.warn(
-                        "Invalid server message."
-                    );
+    moveHistory=
+        message.moveHistory||[];
 
-                }
+    capturedPieces=
+        message.capturedPieces||[];
 
-            };
+    lastMove=
+        message.lastMove
+            ?{
+                from:{...message.lastMove.from},
+                to:{...message.lastMove.to}
+            }
+            :null;
 
-    }
-    catch(error){
+    selectedSquare=null;
+    legalTargets=[];
 
-        showToast(
-            "Could not connect to server."
-        );
+    gameOver=false;
+    aiThinking=false;
 
-    }
-
-}
-
-
-/* =========================================================
-   SEND SERVER MESSAGE
-   ========================================================= */
-
-function sendServerMessage(data){
-
-    if(
-        socket &&
-        socket.readyState ===
-        WebSocket.OPEN
-    ){
-
-        socket.send(
-            JSON.stringify(data)
-        );
-
-    }
-    else{
-
-        showToast(
-            "Not connected to server."
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   CREATE INVITE
-   ========================================================= */
-
-function generateInviteCode(){
-
-    return Math.random()
-        .toString(36)
-        .slice(2,8)
-        .toUpperCase();
-
-}
-
-
-function createOnlineGame(){
-
-    gameMode = "online";
-
-    onlineHost = true;
-
-    onlineColor = "w";
-
-    updateModeButtons();
-
-    newGame();
-
-    connectToServer();
-
-
-    onlineCode =
-        generateInviteCode();
-
-
-    setTimeout(
-        () => {
-
-            sendServerMessage({
-
-                type:"create",
-
-                code:onlineCode
-
-            });
-
-        },
-        300
-    );
-
-
-    $("inviteCode")
-        .textContent =
-        onlineCode;
-
-
-    $("inviteOverlay")
-        .classList
-        .add("show");
-
-
-    $("connectionStatus")
-        .textContent =
-        "Creating game…";
-
-
+    renderBoard();
+    updatePanels();
+    updateClocks();
     updateNames();
 
-}
+    startClock();
 
-
-/* =========================================================
-   JOIN INVITE
-   ========================================================= */
-
-function joinOnlineGame(){
-
-    const code =
-        $("inviteInput")
-            .value
-            .trim()
-            .toUpperCase();
-
-
-    if(code.length !== 6){
-
-        showToast(
-            "Enter a 6-character invite code."
-        );
-
-        return;
-
-    }
-
-
-    gameMode = "online";
-
-    onlineHost = false;
-
-    onlineColor = "b";
-
-    onlineCode = code;
-
-
-    updateModeButtons();
-
-    newGame();
-
-    connectToServer();
-
-
-    setTimeout(
-        () => {
-
-            sendServerMessage({
-
-                type:"join",
-
-                code
-
-            });
-
-        },
-        300
+    setStatus(
+        onlineColor===turn
+            ?"Your turn."
+            :"Opponent's turn."
     );
-
-
-    $("connectionStatus")
-        .textContent =
-        "Joining game…";
-
-
-    updateNames();
-
 }
 
-
 /* =========================================================
-   SEND ONLINE MOVE
+   PEER MESSAGE HANDLER
    ========================================================= */
 
-function sendOnlineMove(
-    move,
-    promotion
-){
+function handlePeerMessage(message){
 
-    if(!onlineCode)
+    if(!message||typeof message!=="object")
         return;
 
+    if(message.type==="sync"){
 
-    sendServerMessage({
-
-        type:"move",
-
-        code:onlineCode,
-
-        move,
-
-        promotion:
-            promotion || null
-
-    });
-
-}
-
-
-/* =========================================================
-   SERVER MESSAGES
-   ========================================================= */
-
-function handleServerMessage(message){
-
-    if(
-        message.type ===
-        "created"
-    ){
-
-        onlineColor =
-            "w";
-
-
-        updateNames();
-
-
-        $("connectionStatus")
-            .textContent =
-            "Waiting for opponent…";
-
+        receiveGameSync(message);
 
         return;
-
     }
 
-
-    if(
-        message.type ===
-        "joined"
-    ){
-
-        onlineColor =
-            message.color ||
-            "b";
-
-
-        updateNames();
-
-
-        $("connectionStatus")
-            .textContent =
-            "Opponent joined.";
-
-
-        return;
-
-    }
-
-
-    if(
-        message.type ===
-        "start"
-    ){
-
-        onlineColor =
-            message.color;
-
-
-        updateNames();
-
-
-        setStatus(
-            onlineColor === turn
-                ? "Your turn."
-                : "Opponent's turn."
-        );
-
-
-        return;
-
-    }
-
-
-    if(
-        message.type ===
-        "move"
-    ){
+    if(message.type==="move"){
 
         /*
-           Don't replay our own move.
+           Ignore a message claiming to be
+           from our own color.
         */
 
         if(
-            message.color ===
+            message.color===
             onlineColor
         ){
-
             return;
-
         }
-
 
         makeMove(
             message.move,
-            message.promotion,
+            message.promotion||null,
             true
         );
 
-
         return;
-
     }
 
+    if(message.type==="drawOffer"){
 
-    if(
-        message.type ===
-        "error"
-    ){
-
-        showToast(
-            message.message ||
-            "Online error."
-        );
-
-        return;
-
-    }
-
-
-    if(
-        message.type ===
-        "resign"
-    ){
-
-        finishGame(
-            onlineColor ===
-            message.winner
-                ? "You win!"
-                : "Opponent wins!",
-            "Your opponent resigned.",
-            "🏳️"
-        );
-
-        return;
-
-    }
-
-
-    if(
-        message.type ===
-        "opponentDisconnected"
-    ){
-
-        finishGame(
-            "You win!",
-            "Your opponent disconnected.",
-            "📡"
-        );
-
-        return;
-
-    }
-
-}
-
-
-/* =========================================================
-   UI EVENTS
-   ========================================================= */
-
-$("botMode")
-    .onclick = () => {
-
-        gameMode = "bot";
-
-        onlineColor = null;
-
-        updateModeButtons();
-
-        newGame();
-
-    };
-
-
-$("localMode")
-    .onclick = () => {
-
-        gameMode = "local";
-
-        onlineColor = null;
-
-        updateModeButtons();
-
-        newGame();
-
-    };
-
-
-$("onlineMode")
-    .onclick = () => {
-
-        gameMode = "online";
-
-        updateModeButtons();
-
-        newGame();
-
-        connectToServer();
-
-        setStatus(
-            "Create or join an online game."
-        );
-
-    };
-
-
-$("difficulty")
-    .onchange = event => {
-
-        difficulty =
-            Number(
-                event.target.value
+        const accepted=
+            confirm(
+                "Your opponent offered a draw. Accept?"
             );
 
-        saveGame();
+        if(accepted){
 
-    };
+            sendPeerMessage({
+                type:"drawAccepted"
+            });
 
+            finishGame(
+                "Draw",
+                "Draw agreed.",
+                "🤝"
+            );
 
-$("timeControl")
-    .onchange = () => {
+        }else{
 
-        newGame();
-
-    };
-
-
-$("newGameButton")
-    .onclick =
-    newGame;
-
-
-$("saveButton")
-    .onclick = () => {
-
-        saveGame();
-
-        showToast(
-            "Game saved in this browser."
-        );
-
-    };
-
-
-$("undoButton")
-    .onclick =
-    undoMove;
-
-
-$("flipButton")
-    .onclick =
-    flipBoard;
-
-
-$("playAgain")
-    .onclick =
-    newGame;
-
-
-$("closeGameOver")
-    .onclick = () => {
-
-        $("gameOverOverlay")
-            .classList
-            .remove("show");
-
-    };
-
-
-$("drawButton")
-    .onclick = () => {
-
-        if(
-            gameMode === "online"
-        ){
-
-            sendServerMessage({
-
-                type:"draw",
-
-                code:onlineCode
-
+            sendPeerMessage({
+                type:"drawDeclined"
             });
 
             showToast(
-                "Draw offer sent."
+                "Draw declined."
             );
-
-            return;
-
         }
 
+        return;
+    }
+
+    if(message.type==="drawAccepted"){
 
         finishGame(
             "Draw",
@@ -5813,92 +3636,528 @@ $("drawButton")
             "🤝"
         );
 
-    };
+        return;
+    }
 
+    if(message.type==="drawDeclined"){
 
-$("resignButton")
-    .onclick = () => {
+        showToast(
+            "Opponent declined the draw."
+        );
 
-        if(gameOver)
-            return;
+        return;
+    }
 
-
-        if(
-            gameMode === "online"
-        ){
-
-            sendServerMessage({
-
-                type:"resign",
-
-                code:onlineCode
-
-            });
-
-            finishGame(
-                "You resigned",
-                "The game has ended.",
-                "🏳️"
-            );
-
-            return;
-
-        }
-
+    if(message.type==="resign"){
 
         finishGame(
-            turn === "w"
-                ? "Black wins!"
-                : "White wins!",
-            "Resignation.",
+            "You win!",
+            "Your opponent resigned.",
             "🏳️"
         );
 
-    };
+        return;
+    }
 
+    if(message.type==="timeout"){
 
-$("createInvite")
-    .onclick =
-    createOnlineGame;
+        const loser=message.color;
 
+        if(loser===onlineColor){
 
-$("joinInvite")
-    .onclick =
-    joinOnlineGame;
+            finishGame(
+                "You lose!",
+                "You ran out of time.",
+                "⏱️"
+            );
 
+        }else{
 
-$("copyInvite")
-    .onclick = () => {
-
-        if(
-            navigator.clipboard
-        ){
-
-            navigator.clipboard
-                .writeText(
-                    onlineCode || ""
-                )
-                .then(
-                    () =>
-                        showToast(
-                            "Invite code copied!"
-                        )
-                );
-
+            finishGame(
+                "You win!",
+                "Your opponent ran out of time.",
+                "⏱️"
+            );
         }
 
-    };
+        return;
+    }
 
+    if(message.type==="ping"){
 
-$("closeInvite")
-    .onclick = () => {
+        sendPeerMessage({
+            type:"pong"
+        });
 
-        $("inviteOverlay")
-            .classList
-            .remove("show");
+        return;
+    }
+}
 
-    };
+/* =========================================================
+   CREATE ONLINE GAME
+   ========================================================= */
 
+function createOnlineGame(){
+
+    /*
+       Close any previous PeerJS session.
+    */
+
+    closeOnlineConnection();
+
+    gameMode="online";
+
+    onlineHost=true;
+    onlineColor="w";
+    onlineConnected=false;
+
+    updateModeButtons();
+
+    newGame();
+
+    /*
+       Generate a six-character PeerJS ID.
+
+       This is the actual PeerJS host ID,
+       so no separate server is needed.
+    */
+
+    onlineCode=
+        generatePeerCode();
+
+    $("inviteCode")
+        .textContent=
+        onlineCode;
+
+    $("connectionStatus")
+        .textContent=
+        "Creating invite…";
+
+    updateNames();
+
+    $("inviteOverlay")
+        .classList
+        .add("show");
+
+    startPeer(
+        onlineCode
+    );
+}
+
+/* =========================================================
+   JOIN ONLINE GAME
+   ========================================================= */
+
+function joinOnlineGame(){
+
+    const code=
+        $("inviteInput")
+            .value
+            .trim()
+            .toUpperCase();
+
+    if(!/^[A-Z0-9]{6}$/.test(code)){
+
+        showToast(
+            "Enter a valid 6-character invite code."
+        );
+
+        return;
+    }
+
+    closeOnlineConnection();
+
+    gameMode="online";
+
+    onlineHost=false;
+    onlineColor="b";
+    onlineCode=code;
+    onlineConnected=false;
+
+    updateModeButtons();
+
+    /*
+       Reset our local game.
+
+       The host will immediately send
+       the authoritative state after
+       PeerJS connects.
+    */
+
+    newGame();
+
+    updateNames();
+
+    $("connectionStatus")
+        .textContent=
+        "Starting online connection…";
+
+    /*
+       Guest gets a temporary PeerJS ID.
+    */
+
+    startPeer();
+
+    /*
+       Wait for guest PeerJS to become open.
+    */
+
+    let attempts=0;
+
+    const wait=
+        setInterval(()=>{
+
+            attempts++;
+
+            if(
+                peer &&
+                peer.open
+            ){
+
+                clearInterval(wait);
+
+                connectToHost(
+                    code
+                );
+
+            }
+
+            if(attempts>150){
+
+                clearInterval(wait);
+
+                $("connectionStatus")
+                    .textContent=
+                    "Connection timed out.";
+
+                showToast(
+                    "Could not connect to that game."
+                );
+            }
+
+        },100);
+}
+
+/* =========================================================
+   ONLINE MOVE
+   ========================================================= */
+
+function sendOnlineMove(
+    move,
+    promotion
+){
+
+    if(!onlineConnected)
+        return;
+
+    sendPeerMessage({
+
+        type:"move",
+
+        color:onlineColor,
+
+        move:cloneMove(move),
+
+        promotion:
+            promotion||null
+    });
+}
+
+/* =========================================================
+   CLOSE ONLINE
+   ========================================================= */
+
+function closeOnlineConnection(){
+
+    onlineConnected=false;
+
+    if(onlineConnection){
+
+        try{
+            onlineConnection.close();
+        }catch(e){}
+    }
+
+    onlineConnection=null;
+
+    if(peer){
+
+        try{
+            peer.destroy();
+        }catch(e){}
+    }
+
+    peer=null;
+
+    onlineCode=null;
+    onlineColor=null;
+    onlineHost=false;
+    peerStarting=false;
+}
+
+/* =========================================================
+   UI EVENTS
+   ========================================================= */
+
+$("botMode").onclick=()=>{
+
+    closeOnlineConnection();
+
+    gameMode="bot";
+
+    onlineColor=null;
+
+    updateModeButtons();
+
+    newGame();
+};
+
+$("localMode").onclick=()=>{
+
+    closeOnlineConnection();
+
+    gameMode="local";
+
+    onlineColor=null;
+
+    updateModeButtons();
+
+    newGame();
+};
+
+$("onlineMode").onclick=()=>{
+
+    /*
+       Merely selecting Online does not
+       create a room automatically.
+    */
+
+    closeOnlineConnection();
+
+    gameMode="online";
+
+    onlineColor=null;
+    onlineHost=false;
+
+    updateModeButtons();
+
+    newGame();
+
+    $("connectionStatus")
+        .textContent=
+        "Create or join an online game.";
+
+    setStatus(
+        "Create or join an online game."
+    );
+};
+
+$("difficulty").onchange=event=>{
+
+    difficulty=
+        Number(event.target.value);
+
+    saveGame();
+};
+
+$("timeControl").onchange=()=>{
+
+    /*
+       Don't change time while an active
+       online game is connected.
+    */
+
+    if(
+        gameMode==="online"&&
+        onlineConnected
+    ){
+
+        showToast(
+            "Time control cannot change during an online game."
+        );
+
+        return;
+    }
+
+    newGame();
+};
+
+$("newGameButton").onclick=()=>{
+
+    if(
+        gameMode==="online" &&
+        onlineConnected
+    ){
+
+        showToast(
+            "Finish the online game before starting a new one."
+        );
+
+        return;
+    }
+
+    newGame();
+};
+
+$("saveButton").onclick=()=>{
+
+    saveGame();
+
+    showToast(
+        "Game saved in this browser."
+    );
+};
+
+$("undoButton").onclick=
+    undoMove;
+
+$("flipButton").onclick=
+    flipBoard;
+
+$("playAgain").onclick=()=>{
+
+    if(gameMode==="online"){
+
+        showToast(
+            "Create a new online invite for another game."
+        );
+
+        $("gameOverOverlay")
+            .classList.remove("show");
+
+        return;
+    }
+
+    newGame();
+};
+
+$("closeGameOver").onclick=()=>{
+
+    $("gameOverOverlay")
+        .classList
+        .remove("show");
+};
+
+$("drawButton").onclick=()=>{
+
+    if(gameMode==="online"){
+
+        if(!onlineConnected){
+
+            showToast(
+                "Opponent is not connected."
+            );
+
+            return;
+        }
+
+        sendPeerMessage({
+            type:"drawOffer"
+        });
+
+        showToast(
+            "Draw offer sent."
+        );
+
+        return;
+    }
+
+    finishGame(
+        "Draw",
+        "Draw agreed.",
+        "🤝"
+    );
+};
+
+$("resignButton").onclick=()=>{
+
+    if(gameOver)
+        return;
+
+    if(gameMode==="online"){
+
+        if(onlineConnected){
+
+            sendPeerMessage({
+                type:"resign"
+            });
+        }
+
+        finishGame(
+            "You resigned",
+            "The game has ended.",
+            "🏳️"
+        );
+
+        return;
+    }
+
+    finishGame(
+        turn==="w"
+            ?"Black wins!"
+            :"White wins!",
+        "Resignation.",
+        "🏳️"
+    );
+};
+
+$("createInvite").onclick=
+    createOnlineGame;
+
+$("joinInvite").onclick=
+    joinOnlineGame;
+
+$("copyInvite").onclick=()=>{
+
+    if(!onlineCode)
+        return;
+
+    if(navigator.clipboard){
+
+        navigator.clipboard
+            .writeText(onlineCode)
+            .then(()=>{
+
+                showToast(
+                    "Invite code copied!"
+                );
+
+            })
+            .catch(()=>{
+
+                showToast(
+                    "Could not copy code."
+                );
+            });
+
+    }else{
+
+        showToast(
+            "Copy this code: "+onlineCode
+        );
+    }
+};
+
+$("closeInvite").onclick=()=>{
+
+    $("inviteOverlay")
+        .classList
+        .remove("show");
+};
+
+/*
+   Press Enter in invite input to join.
+*/
+
+$("inviteInput").addEventListener(
+    "keydown",
+    event=>{
+
+        if(event.key==="Enter"){
+            joinOnlineGame();
+        }
+    }
+);
 
 /* =========================================================
    INITIALIZATION
@@ -5906,27 +4165,26 @@ $("closeInvite")
 
 function initialize(){
 
-    const loaded =
-        loadGame();
-
+    const loaded=loadGame();
 
     if(!loaded){
-
         newGame();
-
     }
 
+    /*
+       Never restore an old online connection.
+    */
+
+    if(gameMode==="online"){
+        gameMode="bot";
+    }
 
     updateModeButtons();
-
     updateNames();
-
+    renderBoard();
+    updatePanels();
+    updateClocks();
 }
-
-
-/*
-   Start
-*/
 
 initialize();
 
